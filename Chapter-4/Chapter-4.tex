@@ -1,0 +1,20 @@
+\chapter{Conclusion}
+
+\section{Conclusion and Open Directions}
+In this work, we give the first algorithms for 
+testing unateness of real-valued functions over the hypercube as well as the hypergrid domains.
+We also show that our algorithms are optimal by proving matching lower bounds, thus resolving the query complexity of testing unateness of real-valued functions.
+Our results demonstrate that, for real-valued functions, in contrast to monotonicity testing, adaptivity helps with testing unateness. 
+
+%We completed the problem of testing Unateness of the real-valued functions
+The query complexity of testing unateness of Boolean functions has not been completely resolved yet.
+Concurrent with our work, Chen et al.~\cite{CWX17} proved a lower bound of $\Omega\left(\frac{d^{2/3}}{\log^3 d} \right)$ for adaptive unateness testers of Boolean functions over $\{0,1\}^d$.
+Subsequently, Chen et al.~\cite{CWX17focs} gave an adaptive unateness tester with query complexity $\widetilde{O}\left(\frac{d^{3/4}}{\eps^2}\right)$ for the same class of functions.
+It remains to be seen if this polynomial gap (in $d$) between the bounds can be closed further.
+
+On nonadaptive unateness testing of Boolean functions over $\{0,1\}^d$, in a subsequent work, Baleshzar et al.~\cite{BCPRS17b} proved a lower bound of $\Omega\left(\frac{d}{\log d} \right)$ for one-sided error testers.
+Since Boolean functions are special cases of real-valued functions, 
+our nonadaptive algorithm over the hypercube also works for Boolean functions.
+The query complexity of this algorithm is $O\left(\frac{d \log d}{\eps}\right)$ which is currently the best known upper bound.
+An interesting open question is to determine if testers with two-sided error have better query complexity than testers with one-sided error in the nonadaptive setting. 
+%but there are still some gaps for the boolean case. According to this work the best known nonadaptive upper bound for testing unateness of boolean function over the hypercube domain is $O(\frac{d\log d}{\eps})$, even though the best known lower bound according to a subsequent work to this work~\cite{GGLRS00} is $\Omega(\frac{d}{\log d})$. Also, for the adaptive case we show the upper bound of $O(\frac{d}{\eps})$ in this work while the best known lower bound is $\Omega(\frac{\sqrt{d}}{\log^2 d})$ according to~\cite{GGLRS00}.

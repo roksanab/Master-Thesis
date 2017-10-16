@@ -1,0 +1,418 @@
+\chapter{Upper Bounds}\label{sec:upper-bounds}
+
+In this section, we prove parts 1-2 of Theorem~\ref{thm:main-hg}, starting from the hypercube domain.
+
+Recall the definition of $i$-edges and $i$-lines from Section~\ref{sec:intro-tech} and what it means for an edge to be increasing, decreasing, and constant.
+
+The starting point for our algorithms is the dimension reduction theorem from~\cite{CDJS17}. It bounds the distance of $f:[n]^d \to \R$ to monotonicity in terms of average distances of restrictions of $f$ to one-dimensional functions.
+%One-dimensional domain $[n]$ is called a {\em line}.
+\begin{theorem}[Dimension Reduction, Theorem 1.8 in \cite{CDJS17}] \label{thm:dimred} Fix a bit vector ${\bf b}\in\{0,1\}^d$ and a function $f:[n]^d \to \R$ which is $\eps$-far from ${\bf b}$-monotonicity.
+	For all $i\in[d]$, let $\mu_i$ be the average distance of $f_{|\ell}$ to $\bb_i$-monotonicity over all $i$-lines $\ell$.
+	Then, $$\sum_{i=1}^d \mu_i \geq \frac{\eps}{4}.$$
+\end{theorem}
+For the special case of the hypercube domains, $i$-lines become $i$-edges, and the average distance $\mu_i$ to $\bb_i$-monotonicity is the fraction of $i$-edges on which the function is not $\bb_i$-monotone.
+
+
+\section{The Nonadaptive Tester over the Hypercube}\label{sec:non-adap-ub}
+We now describe Algorithm~\ref{alg:na-unate}, the nonadaptive tester for unateness over the hypercubes.
+
+\begin{algorithm}
+\caption{The Nonadaptive Unateness Tester over Hypercubes} \label{alg:na-unate}
+\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+\SetKwFor{RepeatTimes}{repeat}{times}{end}
+\SetKwFor{RepeatIterations}{repeat}{iterations}{end}
+\Input{distance parameter $\eps \in (0,1/2)$; query access to a function $f:\{0,1\}^d \to \R$.}
+\DontPrintSemicolon
+\BlankLine
+\nl \For{$r = 1$ to $\cei{3\log(4d/\eps)}$}{
+\nl \RepeatTimes{$s_r = \cei{\frac{16d \ln 4}{\eps\cdot 2^r}}$}{
+\nl \label{step:sample-dim}Sample a dimension $i \in [d]$ uniformly at random. \;
+\nl \label{step:reject-hc}Sample $3 \cdot 2^r$ $i$-edges uniformly and independently at random and {\bf reject} if there exists an increasing edge and a decreasing edge among the sampled edges.\;
+}
+}
+\nl {\bf accept}\;
+\end{algorithm}
+
+It is evident that \Alg{na-unate} is a nonadaptive, one-sided error tester. Furthermore,
+its query complexity is $O\left(\frac{d}{\eps}\log\frac{d}{\eps}\right)$. It suffices to prove
+the following.
+
+\begin{lemma} \label{lem:na-unate-rej}
+If $f$ is $\eps$-far from unate,
+	\Alg{na-unate} rejects with probability at least $2/3$.
+\end{lemma}
+
+\begin{proof} Recall that $\alpha_i$ is the fraction of $i$-edges that are decreasing, $\beta_i$ is the fraction of $i$-edges that are increasing and $\mu_i = \min(\alpha_i,\beta_i).$
+	
+	
+	Define the $d$-dimensional bit vector ${\bf b}$ as follows: for each $i\in [d],$ let ${\bf b}_i = 0$
+	if $\alpha_i < \beta_i$ and $\bb_i = 1$ otherwise.
+	Observe that the average distance of $f$ to $\bb_i$-monotonicity over a random $i$-edge is precisely $\mu_i$.
+	Since $f$ is $\eps$-far from being unate,
+	$f$ is also $\eps$-far from being ${\bf b}$-monotone.
+	By \Thm{dimred}, $\sum_{i \in [d]} \mu_i \geq \frac\eps 4$. Hence, $\Exp_{i \in [d]}[\mu_i] \geq \frac\eps{4d}$.
+	We now apply the work investment strategy due to Berman et al.~\cite{BerRY14} to get an upper bound on the probability that \Alg{na-unate} fails to reject.
+
+\begin{theorem}[\cite{BerRY14}]\label{thm:wis}
+For a random variable $X \in [0,1]$ with $\Exp[X] \geq \mu$ for $\mu < \frac 1 2$, let $p_r = \Pr[X \geq 2^{-r}]$ and $\delta \in (0,1)$ be the desired error probability. Let $s_r = \frac{4 \ln 1/\delta}{\mu \cdot 2^r}$. Then,
+$$\prod\limits_{r=1}^{\lceil 3\log (1/\mu) \rceil} (1-p_r)^{s_r} \leq \delta. $$
+\end{theorem}
+
+\noindent Consider running \Alg{na-unate} on a function $f$ that is $\eps$-far from unate. Let $X = \mu_i$ where $i$ is sampled uniformly at random from $[d]$. Then $\Exp[X] \geq \frac\eps{4d}$. Applying the work investment strategy (\Thm{wis}) on $X$ with $\mu=\frac\eps{4d}$, we get that the probability that, in some iteration, \Step{sample-dim} samples a dimension $i$ such that $\mu_i\geq 2^{-r}$ is at least $1-\delta$.
+We set $\delta = 1/4$.
+Conditioned on sampling such a dimension, the probability that \Step{reject-hc} fails to obtain an increasing edge and a decreasing edge among its $3 \cdot 2^r$ samples is at most $2\left(1-2^{-r}\right)^{3 \cdot 2^r} \leq 2e^{-3} < 1/9$, as the fraction of both increasing and decreasing edges in the dimension is at least $2^{-r}$.
+Hence, the probability that \Alg{na-unate} rejects $f$ is at least $\frac{3}{4} \cdot \frac{8}{9} = \frac{2}{3}$,
+which completes the proof of Lemma~\ref{lem:na-unate-rej}.
+\end{proof}
+
+\section{The Adaptive Tester over the Hypercube}\label{sec:adap-ub}
+We now describe Algorithm~\ref{alg:adap-unate}, an adaptive tester for unateness over the hypercube domain with good expected query complexity. The final tester is obtained by repeating this tester and accepting if the number of queries exceeds a specified bound.
+
+\begin{algorithm}
+\caption{The Adaptive Unateness Tester over Hypercubes} \label{alg:adap-unate}
+\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+\SetKwFor{RepeatTimes}{repeat}{times}{end}
+\SetKwFor{RepeatIterations}{repeat}{iterations}{end}
+\Input{distance parameter $\eps \in (0,1/2)$; query access to a function $f:\{0,1\}^d \to \R$.}
+\DontPrintSemicolon
+\BlankLine
+\nl\label{step:repeat}\RepeatTimes{$10/\eps$}{
+\nl\label{step:begin-adap-hc}\For{$i = 1$ to $d$}{
+\nl\label{step:sample-s}Sample an $i$-edge $e_i$ uniformly at random.\;
+\nl\label{step:end-build-s}\If{$e_i$ is non-constant (i.e., increasing or decreasing)}{
+\nl\label{step:stage-2-edge-sample} Sample $i$-edges uniformly at random till we obtain a non-constant edge $e_i'$.\;
+\nl\label{step:end-adap-hc} {\bf reject} if one of the edges $e_i, e_i'$ is increasing and the other is decreasing.\;}
+}}
+\nl {\bf accept}
+\end{algorithm}
+
+\begin{claim} \label{clm:time}
+The expected number of queries made by
+\Alg{adap-unate} is $40d/\eps$.
+\end{claim}
+
+\begin{proof}
+Consider one iteration of the {\bf repeat}-loop in Step~\ref{step:repeat}.
+We prove that the expected number of queries in this iteration is $4d$.
+The total number of queries in Step~\ref{step:sample-s} is $2d$, as 2 points per dimension are queried.
+	Let $E_i$ be the event that edge $e_i$ is non-constant and $T_i$ be the random variable for the number of $i$-edges sampled in \Step{stage-2-edge-sample}. Then $\Exp[T_i] = \frac 1{\alpha_i+\beta_i}=\frac 1{\Pr[E_i]}$. Therefore, the expected number of all edges sampled in \Step{stage-2-edge-sample} is $\sum_{i=1}^d \Pr[E_i]\cdot\Exp[T_i]=\sum_{i=1}^d \Pr[E_i] \cdot \frac 1{\Pr[E_i]} = d$. Hence, the expected number of queries in \Step{stage-2-edge-sample} is $2d$. Since there are $10/\eps$ iterations in Step~\ref{step:repeat}, the expected number of queries in \Alg{adap-unate} is $40d/\eps$.
+\end{proof}
+
+\begin{claim} \label{clm:rej}
+If $f$ is $\eps$-far from unate, \Alg{adap-unate} accepts with probability at most $1/6$.
+\end{claim}
+
+\begin{proof}
+First, we bound the probability that a violation of unateness is detected in some dimension $i \in [d]$ in one iteration of the {\bf repeat}-loop.
+Consider the probability of finding a %strictly
+decreasing $i$-edge in Step~\ref{step:sample-s}, and an %strictly
+increasing $i$-edge in \Step{stage-2-edge-sample}.
+	The former is exactly $\alpha_i,$ and the latter is $\frac{\beta_i}{\alpha_i+\beta_i}$. Therefore, the probability we detect a violation from dimension $i$ is
+$\frac{2 \alpha_i \beta_i}{\alpha_i+\beta_i} \geq \min(\alpha_i,\beta_i) = \mu_i$.
+The probability that we fail to detect a violation in any of the $d$ dimensions is at most $\prod_{i =1}^d (1-\mu_i) \leq \exp\big(-\sum_{i = 1}^d \mu_i\big),$ which is at most $e^{-\eps/4}$ by \Thm{dimred} (Dimension Reduction). By Taylor expansion of $e^{-\eps/4}$, the probability of finding a violation in one iteration is at least $1-e^{-\eps/4} \geq
+\frac{\eps}{4} - \frac{\eps^2}{32} >
+\frac{\eps}{5}$. %as $\eps < 1/2$.
+The probability that \Alg{adap-unate} does not reject in any iteration is at most $(1-\eps/5)^{10/\eps} < 1/6$.
+\end{proof}
+
+\begin{proof}[{Proof of Theorem~\ref{thm:main-hg}, Part 2} (for the special case of the hypercube domain)]
+We run \Alg{adap-unate}, aborting and accepting if we ever make more than $240d/\eps$ queries. By Markov's inequality, the probability of aborting is at most $1/6$.
+By Claim~\ref{clm:rej}, if $f$ is $\eps$-far from unate, \Alg{adap-unate} accepts with probability at most $1/6$. The theorem follows by a union bound.
+\end{proof}
+
+\section{Extension to Hypergrids}\label{sec:hypergrids}
+We start by establishing terminology for lines and pairs.
+Consider a function $f:[n]^d\to\R$.
+Recall the definition of $i$-lines from Section~\ref{sec:intro-tech}.
+A pair of points that differ only in coordinate $i$ is called an $i$-pair.
+An $i$-pair $(x,y)$ with $x_i < y_i$ is called {\em increasing} if $f(x) < f(y)$, {\em decreasing} if $f(x) > f(y),$ and {\em constant} if $f(x) = f(y)$.
+
+\begin{algorithm}
+\caption{Tree Tester}\label{alg:tree-tester}
+\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+\SetKwFor{RepeatTimes}{repeat}{times}{end}
+\SetKwFor{RepeatIterations}{repeat}{iterations}{end}
+\Input{Query access to a function $h:[n] \mapsto \R$.}
+\DontPrintSemicolon
+\BlankLine
+
+\nl Pick $x \in [n]$ uniformly at random. \;
+\nl Let $Q_x\subseteq [n]$ be the set of points visited in a binary search for $x$. Query $h$ on all points in $Q_x$. \;
+\nl If there is an increasing pair in $Q_x$, set $\dir \gets \{\uparrow\}$; otherwise, $\dir\gets\emptyset.$\;
+\nl If there is a decreasing pair in $Q_x$, update $\dir \gets\dir \cup \{\downarrow\}$. \;
+\nl {\bf Return} $\dir$.
+\end{algorithm}
+
+The main tool for extending Algorithms~\ref{alg:na-unate} and \ref{alg:adap-unate} to work on hypergrids is the {\em tree tester}, designed by Ergun et al.~\cite{EKKRV00} to test monotonicity of functions $h:[n]\to\R$.
+We modify the tree tester to return information about directions it observed instead of just accepting or rejecting. See Algorithm~\ref{alg:tree-tester}. 
+We call a function $h:[n] \mapsto \R$ \emph{antimonotone} if $f(x) \geq f(y)$ for all $x < y$.
+The following lemma summarizes the guarantee of the tree tester.
+
+\begin{lemma}[\cite{EKKRV00, CDJS17}] \label{lem:line}
+If $h:[n] \mapsto \R$ is $\eps$-far from monotone (respectively, antimonotone), then the output of \Alg{tree-tester} on $h$ contains $\downarrow$ (respectively, $\uparrow$) with probability at least $\eps$.
+\end{lemma}
+
+\begin{algorithm}
+\caption{The Adaptive Unateness Tester over Hypergrids} \label{alg:adap-unate-hg}
+\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+\SetKwFor{RepeatTimes}{repeat}{times}{end}
+\SetKwFor{RepeatIterations}{repeat}{iterations}{end}
+\Input{distance parameter $\eps \in (0,1/2)$; query access to a function $f:[n]^d \to \R$.}
+\DontPrintSemicolon
+\BlankLine
+\nl \RepeatTimes{$10/\eps$}{
+\nl\label{step:begin-adap-hg}\For{$i = 1$ to $d$}{
+\nl Sample an $i$-line $\ell_i$ uniformly at random.\;
+\nl\label{step:test-i-line}Let $\dir_i$ be the output of \Alg{tree-tester} on $f_{|\ell_i}$. \;
+\nl \If{$\dir_i \ne \emptyset$}{
+\nl\label{step:verify-i-line} Sample $i$-lines uniformly at random and run \Alg{tree-tester} on $f$ restricted to each line until it returns a non-empty set. Call it $\dir_i'$.\;
+\nl  If $\dir_i \cup \dir_i' = \{\uparrow, \downarrow \}$, {\bf reject}.\;
+}}}
+\nl {\bf accept}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+	\caption{The Nonadaptive Unateness Tester over Hypergrids} \label{alg:na-unate-hg}
+	\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+	\SetKwFor{RepeatTimes}{repeat}{times}{end}
+	\SetKwFor{RepeatIterations}{repeat}{iterations}{end}
+	\Input{distance parameter $\eps \in (0,1/2)$; query access to a function $f:[n]^d \to \R$.}
+	\DontPrintSemicolon
+	\BlankLine
+	
+	\nl \label{step:mono}\RepeatTimes{$220/\eps$}{
+		\nl \label{step:mono-start}\For{$i=1$ to $d$}{
+			\nl Sample an $i$-line $\ell$ uniformly at random. \;
+			\nl \label{step:log}{\bf Reject} if \Alg{tree-tester}, on input $f_{|\ell}$, returns $\{\uparrow,\downarrow\}$.
+		}
+	}
+	\nl \label{step:cube}\For{$r=1$ to $\cei{3 \log(200d/\eps)}$}{
+		\nl \RepeatTimes{$s_r = \cei{\frac{800d \ln 4}{\eps \cdot 2^r}}$}{
+			\nl \label{step:samp-hg1}Sample a dimension $i \in [d]$ uniformly at random.\;
+			\nl \label{step:tree-tester1}Sample $3 \cdot 2^r$ $i$-pairs uniformly and independently at random.\;
+			\nl \label{step:rej-hg1}If we find an increasing and a decreasing pair among the sampled pairs, {\bf reject}.\;
+		}
+	}
+	\nl {\bf accept}			
+\end{algorithm}
+
+Our hypergrid testers are stated in Algorithms~\ref{alg:adap-unate-hg} and~\ref{alg:na-unate-hg}.
+Next, we explain how Lemma~\ref{lem:line} and Theorem~\ref{thm:dimred} are used in the analysis of the adaptive tester.
+For a dimension $i\in[d]$, let $\alpha_i$ and $\beta_i$ denote the average distance of $f_{|\ell}$ to monotonicity and antimonotonicity, respectively, over all $i$-lines $\ell$.
+Then $\mu_i := \min(\alpha_i,\beta_i)$ is the average fraction of points per $i$-line that needs to change to make $f$ unate.
+Define the $\bb$-vector with $\bb_i = 0$ if $\alpha_i < \beta_i$,
+and $\bb_i = 1$ otherwise.
+By \Thm{dimred},
+if $f$ is $\eps$-far from unate, and thus $\eps$-far from $\bb$-monotone, then $\sum_{i=1}^d \mu_i \geq \eps/4$.
+By \Lem{line}, the probability that the output of \Alg{tree-tester} on $f_{|\ell}$
+contains $\downarrow$ (respectively, $\uparrow$), where $\ell$ is a uniformly random $i$-line,
+is at least $\alpha_i$ (respectively, $\beta_i$).
+The rest of the analysis of Algorithm~\ref{alg:adap-unate-hg} is similar to that in the hypercube case.
+
+\begin{proof}[Proof of Theorem~\ref{thm:main-hg}, Part 2]
+	The tester is Algorithm~\ref{alg:adap-unate-hg}.
+As in the proof of Claim~\ref{clm:time}, the expected running time of Algorithm~\ref{alg:adap-unate-hg} is at most $(40d\log n)/\eps$.
+The proof of Claim~\ref{clm:rej} carries over almost word-to-word. Fix dimension $i$. The probability that $\downarrow \in \dir_i$ in Step~\ref{step:test-i-line} is at least $\alpha_i$.
+The probability that $\uparrow \in \dir_i'$ in Step~\ref{step:verify-i-line} is at least $\frac{\beta_i}{\alpha_i + \beta_i}$.
+The rest of the calculation is identical
+to that of the proof of \Clm{rej}.
+\end{proof}
+
+To analyze the nonadaptive tester,
+we prove Lemma~\ref{lem:treetester}, which demonstrates the power of the tree tester and  may be of independent interest.
+
+\begin{lemma}\label{lem:treetester}
+	Consider a function $h:[n]\to \R$ which is $\eps$-far from monotone (respectively, antimonotone). At least one of the following holds:
+	\begin{compactenum}
+		\item $\Pr[\text{\Alg{tree-tester}, on input $h$, returns }\{\uparrow,\downarrow\}] \geq \eps/25$.%where the probability is over the sample $Q$ drawn by the tree tester.
+		\item $\Pr_{u,v \in [n]}[(u,v) \textrm{ is a decreasing (respectively, increasing)  pair}] \geq \eps/25$.
+	\end{compactenum}
+\end{lemma}
+
+
+\begin{proof}
+\def\lca{\mathsf{lca}}
+\def\updown{$\{\uparrow, \downarrow \}$}
+Let $T$ be a balanced binary search tree consisting of elements in $[n]$, such that the set of points visited in a binary search for some $x \in [n]$ corresponds to a path from the root to the node containing $x$ in $T$.
+Let $Q_x$ denote the set of points visited in a binary search for $x \in [n]$.
+For $x, y \in [n]$, denote the least common ancestor of $x$ and $y$ by $\lca(x,y)$.
+
+Let $W_{\uparrow \downarrow}$ be a set of points $x$ such that $Q_x$ contains both an increasing and a decreasing pair (with respect to $h$). If $|W_{\uparrow \downarrow}|\geq \frac{\eps n}{10}$, then Case 1 of Lemma~\ref{lem:treetester} holds. We may therefore assume that $|W_{\uparrow \downarrow}|< \frac{\eps n}{10}$.
+Let $\calE$ be the event that for any $u,v \in [n]$ such that $u < v$, the pair $(u,v)$ is decreasing. We will prove
+that $\Pr[\calE] \geq \eps/25$.
+
+Let $W_{\downarrow}$ be that set of points $x \in [n]$ such that $Q_x$
+contains a decreasing pair. Similarly, define the set $W_{\uparrow}$. Let $W_c$ denote the set of points $x$ such that $h_{|Q_x}$ is constant.
+
+\begin{claim}[\cite{EKKRV00}]\label{clm:2}
+	The function $h$ restricted to the set $W_{\uparrow}\cup W_c$ is monotone.
+\end{claim}
+
+\begin{proof}
+The proof is by contradiction. Suppose $x,y \in (W_{\uparrow} \cup W_c)$ such that $x < y$, but $h(x) > h(y)$.
+Consider $z = \lca(x,y)$. Either $h(x) > h(z)$ or $h(z) > h(y)$, contradicting
+the fact that $x, y \in W_{\uparrow}\cup W_c$.
+\end{proof}
+
+\noindent By symmetry, the function $h$ restricted to the set $W_{\downarrow}\cup W_c$ is antimonotone.
+
+A priori, points in $W_{\uparrow}$ and $W_{\downarrow}$ could be interspersed.
+The next claim shows that they are in different halves of the tree $T$.
+
+\begin{claim}\label{clm:pure}
+	If $x\in W_{\downarrow}$ and $y\in W_{\uparrow}$, then $\lca(x,y)$ is the root of $T$ (which is equal to $\lceil n/2 \rceil$).
+\end{claim}
+
+\begin{proof}
+	Suppose not. Let $z := \lca(x,y)$ and $w$ be the parent of $z$.
+    Consider the case where $z$ is the left child of $w$,  $x$ lies in the left subtree of $z$ and $y$ lies in the right subtree of $z$.
+    (All the other cases have analogous proofs.)
+    Observe that all points in $Q_y$ lie in the interval $[z,w]$.
+    Both $w$ and $z$ are in $Q_x$ as well as in $Q_y$.
+    As $x \in W_{\uparrow}$ and $y \in W_{\downarrow}$, it must be the case that $h(w) = h(z)$.
+    Since $y\notin W_{\uparrow \downarrow}$, for all $p \in Q_y$, we have $h(p) = h(w)$.
+    This contradicts the fact that $y\in  W_{\uparrow}$.
+
+    In all cases, we conclude that either $x\notin W_{\downarrow}$ or
+    $y\notin W_{\uparrow}$.
+    Thus, $z$ cannot have a parent, and $z = \lceil n/2 \rceil$.
+\end{proof}
+
+\begin{claim}\label{clm:obv}
+Let $g:[n] \mapsto \R$ be an antimonotone function and $\dist(g, \mathrm{constant})$ denote the fraction of points that need to be changed so that $g$ is a constant function.
+	If $g$ is antimonotone, and $\dist(g, \mathrm{constant}) \geq \rho$, where $\rho \le \frac 1 2$, then
+	$$\Pr\limits_{u,v \in [n]: u < v} [(u,v) \textrm{ is decreasing}] \geq \frac\rho 2 .$$
+\end{claim}
+
+\begin{proof}
+	The probability that $g(u) \neq g(v)$ is at least $\rho(1-\rho)$ which is at least $\frac \rho 2$ when $\rho \le \frac 1 2$. Since $g$ is antimonotone, $(u,v)$ is a decreasing pair.
+\end{proof}
+
+\noindent
+Let $L$ (respectively, $R$) be the set of points in $[n] \setminus W_{\uparrow \downarrow}$ in the left (respectively, right) subtree of the root. Define $\mu_L := |L|/n$; similarly, define $\mu_R$.
+Observe that both $\mu_L$ and $\mu_R$ are at least $\frac{1}{2} - \frac{\eps}{10}$.
+By Claims~\ref{clm:2} and~\ref{clm:pure}, $h_{|L}$ (and $h_{|R}$) is either monotone or antimonotone.
+Now, if any of these two functions were antimonotone and $\frac\eps 2$-far from being constant (w.l.o.g., assume $h_{|L}$ satisfies the condition), then by \Clm{obv}, we would have
+\[
+\Pr[\calE] \geq \Pr\limits_{u < v}\left[(u,v) \textrm{ is decreasing and }  u,v \in L \right] \geq  \frac\eps 4 \cdot \left(\frac{1}{2} - \frac{\eps}{10} \right)^2  \geq \frac{\eps}{25}.
+\]
+Assume that this doesn't occur. We have two cases.
+
+\noindent {\bf Case 1.} Both $h_{|L}$ and $h_{|R}$ are $\frac\eps 2$-close\footnote{A function $h$ is $\eps$-close to a property $\cP$ if it is sufficient to change at most $\eps$-fraction of values in $h$ to make it satisfy $\cP$.}
+to being constant. In this case, at least $(1-\frac\eps 2)|L|$ points of $L$ evaluate to a constant $C_1$, and at least $(1-\frac\eps 2)|R|$ points of $R$ evaluate to constant $C_2$. We must have $C_1 > C_2$, for otherwise, we can make $h$ monotone by changing only $\frac\eps 2 \cdot (|R|+|L|)+\frac{\eps n}{10} < \eps n$ points, which is a contradiction.
+Hence,
+\[
+\Pr[\calE] \geq \Pr\limits_{u < v} \left[h(u) = C_1 \textrm{ and } h(v) = C_2 \right] \geq \left(1-\frac\eps 2 \right)^2 \mu_L\mu_R > \frac{1}{4} \cdot \left(\frac 1 2- \frac{\eps}{10} \right)^2 \geq \frac{\eps}{25}.
+\]
+
+\noindent {\bf Case 2.} At least one of the functions is $\frac\eps 2$-far from being constant and is monotone.
+W.l.o.g., assume $h_{|L}$ satisfies this condition.
+Note that all points in $L$ are only in $W_{\uparrow}\cup W_c$, and so, all points in $R$ must be in $W_{\downarrow}\cup W_c$.
+This implies that $h_{|R}$ is antimonotone. (Note that a constant function is also antimonotone.)
+But then, $h_{|R}$ must be $\frac \eps 2$-close to being constant.
+Then at least $(1-\frac\eps 2)|R|$ points in $R$ evaluate to a constant, say $C$.
+Let $U$ denote the set of points in $L$ whose values are strictly
+greater than $C$. Since $h_{|L}$ is monotone, we can make
+$h$ monotone by deleting all points in $U, W_{\uparrow \downarrow}$,
+and the points in $R$ that do not evaluate to $C$.
+The total number of points to be deleted is at most $|U| + \frac{\eps n}{10} + \frac{\eps n}{2}$, which must be at least $\eps n$, as $h$ is $\eps$-far from monotone. Hence, $|U| > \eps n/3$.
+Therefore,
+\[
+\Pr[\calE] \geq \Pr\limits_{u < v} \left[ u \in U \textrm{ and } h(v) = C \right] \geq \frac{\eps}{3} \cdot  \left(1 - \frac\eps 2 \right)\mu_R  > \frac{\eps}{25} .
+\]
+This completes the proof of \Lem{treetester}.
+\end{proof}
+
+We now analyze \Alg{na-unate-hg}.
+It is evident that it has one-sided error and makes
+$O(\frac d \eps(\log n + \log\frac d\eps))$ queries.
+It suffices to prove the following.
+
+\begin{theorem} \label{thm:non-adap-hyper} If $f:[n]^d \mapsto \R$ is $\eps$-far
+	from unate, then \Alg{na-unate-hg} rejects with probability at least $2/3$.
+\end{theorem}
+
+\begin{proof} For any line $\ell$, we define the following quantities.
+\begin{compactitem}
+\item $\alpha_\ell$: the distance of $f_{|\ell}$ to monotonicity.
+\item $\beta_\ell$: the distance of $f_{|\ell}$ to antimonotonicity.
+\item $\sigma_\ell$: the probability that \Alg{tree-tester}, on input $f_{|\ell}$, returns $\{\uparrow, \downarrow\}$.
+\item $\delta_\ell$: the probability that a uniformly random pair in $\ell$ is decreasing.
+\item $\lambda_\ell$: the probability that a uniformly random pair in $\ell$ is increasing.
+\end{compactitem}
+
+\noindent Let $L_i$ be the set of $i$-lines. By 
+\Thm{dimred},
+	$$\frac{1}{n^{d-1}} \sum_{i=1}^d \min\left(\sum_{\ell \in L_i} \alpha_\ell, \sum_{\ell \in L_i} \beta_\ell \right) \geq \frac{\eps}{4}.$$
+	By \Lem{treetester}, for every line $\ell$, we have
+	$\sigma_\ell + \delta_\ell \geq \alpha_\ell/25$ and $\sigma_\ell + \lambda_\ell \geq \beta_\ell/25$.
+	Also note,
+	$$
+	\frac{1}{n^{d-1}}\sum_{i=1}^d \left[\sum_{\ell \in L_i} \sigma_\ell + \min\left(\sum_{\ell \in L_i} \delta_\ell, \sum_{\ell \in L_i} \lambda_\ell \right)\right] \geq \frac{1}{n^{d-1}}\sum_{i=1}^d  \min\left(\sum_{\ell \in L_i} (\sigma_\ell + \delta_\ell), \sum_{\ell \in L_i} (\sigma_\ell + \lambda_\ell) \right)$$
+	Combining these bounds, we obtain that the LHS is at least $\eps/100$.
+	%
+	%\[
+	%\frac{1}{n^{d-1}} \sum_{i=1}^d \left[\sum_{\ell \in L_i} \sigma_\ell + \min\left(\sum_{\ell \in L_i} \delta_\ell, \sum_{\ell \in L_i} \lambda_\ell \right)\right]  \geq  \frac{1}{n^{(d-1)}} \sum_{i=1}^d \min\left(\sum_{\ell \in L_i} (\sigma_\ell + \delta_\ell), \sum_{\ell \in L_i} (\sigma_\ell + \lambda_\ell) \right)\]
+	%
+	Note that the first term,
+	which is equal to $\sum_{i=1}^d \EX_{\ell \in L_i} [\sigma_\ell]$,
+	is the expected
+	number of times a single iteration of Steps~\ref{step:mono-start}-\ref{step:log}
+	rejects. If this quantity is at least $\eps/200$, then
+	the tester rejects with probability at least $2/3$. If not,
+	%then $n^{-(d-1)} \sum_i \sum_{\ell \in L_i} \min(\delta_\ell, \lambda_\ell) \geq \eps/200$.
+	then we have $n^{-(d-1)} \sum_{i=1}^d \min(\sum_{\ell \in L_i} \delta_\ell, \sum_{\ell \in L_i} \lambda_\ell) \geq \eps/200$.
+	Using a calculation identical to that of the proof of Lemma~\ref{lem:na-unate-rej},
+	the probability that Step~\ref{step:rej-hg1} rejects in some iteration is at least
+	$2/3$.
+\end{proof}
+
+
+\iffalse
+\noindent
+It is evident that \Alg{na-unate-hg} has one-sided error and makes
+$O(\frac d \eps(\log n + \log\frac d\eps))$ queries.
+It suffices to prove the following.
+
+\begin{theorem} \label{thm:non-adap-hyper} If $f:[n]^d \mapsto \R$ is $\eps$-far
+from unate, then \Alg{na-unate-hg} rejects with probability at least $2/3$.
+\end{theorem}
+
+\begin{proof} For any line $\ell$, we define the following quantities.
+\begin{asparaitem}
+    \item $\alpha_\ell$: the distance of $f_{|\ell}$ to monotonicity.
+    \item $\beta_\ell$: the distance of $f_{|\ell}$ to antimonotonicity.
+    \item $\sigma_\ell$: the probability that \Alg{tree-tester}, on input $f_{|\ell}$, returns $\{\uparrow, \downarrow\}$.
+    \item $\delta_\ell$: the probability that a uniformly random pair in $\ell$
+    is decreasing.
+    \item $\lambda_\ell$: the probability that a uniformly random pair in $\ell$ is increasing.
+\end{asparaitem}
+\noindent
+Let $L_i$ be the set of $i$-lines. By %the dimension reduction of
+\Thm{dimred},
+$$\frac{1}{n^{d-1}} \sum_{i=1}^d \min\left(\sum_{\ell \in L_i} \alpha_\ell, \sum_{\ell \in L_i} \beta_\ell \right) \geq \eps/4.$$
+By \Lem{treetester}, for every line $\ell$, we have
+$\sigma_\ell + \delta_\ell \geq \alpha_\ell/25$ and $\sigma_\ell + \lambda_\ell \geq \beta_\ell/25$.
+Also note,
+$$
+\frac{1}{n^{d-1}}\sum_{i=1}^d \left[\sum_{\ell \in L_i} \sigma_\ell + \min\left(\sum_{\ell \in L_i} \delta_\ell, \sum_{\ell \in L_i} \lambda_\ell \right)\right] \geq \frac{1}{n^{d-1}}\sum_{i=1}^d  \min\left(\sum_{\ell \in L_i} (\sigma_\ell + \delta_\ell), \sum_{\ell \in L_i} (\sigma_\ell + \lambda_\ell) \right)$$
+Combining these bounds, we obtain that the LHS is $\geq \eps/100$.
+%
+%\[
+%\frac{1}{n^{d-1}} \sum_{i=1}^d \left[\sum_{\ell \in L_i} \sigma_\ell + \min\left(\sum_{\ell \in L_i} \delta_\ell, \sum_{\ell \in L_i} \lambda_\ell \right)\right]  \geq  \frac{1}{n^{(d-1)}} \sum_{i=1}^d \min\left(\sum_{\ell \in L_i} (\sigma_\ell + \delta_\ell), \sum_{\ell \in L_i} (\sigma_\ell + \lambda_\ell) \right)\]
+%
+Note that the first term,
+which is equal to $\sum_{i=1}^d \EX_{\ell \in L_i} [\sigma_\ell]$,
+is the expected
+number of times a single iteration of Steps~\ref{step:mono-start}-\ref{step:log}
+rejects. If this quantity is at least $\eps/200$, then
+the tester rejects with probability at least $2/3$. If not,
+%then $n^{-(d-1)} \sum_i \sum_{\ell \in L_i} \min(\delta_\ell, \lambda_\ell) \geq \eps/200$.
+then we have $n^{-(d-1)} \sum_{i=1}^d \min(\sum_{\ell \in L_i} \delta_\ell, \sum_{\ell \in L_i} \lambda_\ell) \geq \eps/200$.
+Using a calculation identical to that of the proof of Lemma~\ref{lem:na-unate-rej},
+the probability that Step~\ref{step:rej-hg1} rejects in some iteration is at least
+$2/3$.
+
+\end{proof}
+%\end{proof}
+\fi

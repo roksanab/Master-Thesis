@@ -1,0 +1,130 @@
+%SourceDoc ../YourName-Dissertation.tex
+\vspace*{-80mm}
+\chapter{Introduction} \label{chapter1:introduction}
+
+\section{Problem Definition}
+%\paragraph{What is unateness?}
+
+We study the problem of testing whether a given real-valued function $f$ on domain $[n]^d$, where $n,d\in\N,$ is unate.
+A function $f:[n]^d \to \R$ is {\em unate} if for every coordinate $i\in [d]$, the function is either nonincreasing in the $\ord{i}$ coordinate or nondecreasing in the $\ord{i}$ coordinate. Monotone functions are special case of Unate functions, which are nondecreasing in all coordinates. 
+%$\bb$-monotone functions, which have a particular direction in each coordinate (either nonincreasing or nondecreasing), specified by a bit-vector $\bb\in \{0,1\}^d$. More precisely,
+%Given a bit-vector $\bb\in \{0,1\}^d$ call
+% a function is $\bb$-monotone if it is nondecreasing in coordinates $i$ with $\bb_i = 0$ and nonincreasing in the other coordinates. Observe that a function $f$ is unate iff there exists some $\bb\in \{0,1\}^d$ for which $f$ is $\bb$-monotone.
+
+The domain $[n]^d$ is called a {\em hypergrid} and the special case $\{0,1\}^d$ is called a {\em hypercube}. The {\sf distance} between two functions $f,g:[n]^d\rightarrow \mathbb{R}$ is equal to the fraction of points $x\in [n]^d$ where $f(x)\neq g(x)$. Given a parameter $\eps \in(0,1)$, two functions $f$ and $g$ are $\eps$-far from each other if the distance between $f$ and $g$ is at least $\eps$. A function $f$ is $\eps$-far from a property $P$ if it is $\eps$-far from any function which has property $P$. A {\em property tester}~\cite{GGR98,RS96} for a property $P$ is a randomized algorithm which, given parameter $\eps \in(0,1)$ and oracle access to the input function $f$, accepts $f$ with probability $\frac{2}{3}$, if it has the property $P$, and rejects $f$ with probability $\frac{2}{3}$, if it is $\eps$-far from $P$. A testing algorithm for property $P$ has {\em $1$-sided error} if it always accepts all input functions that satisfy  property $P$ and {\em $2$-sided error}, otherwise. A tester is {\em nonadaptive} if it makes all queries in advance, and {\em adaptive} if it can make queries after seeing answers to previous ones.
+
+\section{Previous Works}
+The problem of testing unateness was first considered by \citet{GGLRS00}. In their work, by extending their monotonicity tester, they obtain a nonadaptive, $1$-sided error tester for unateness with query complexity $O(\frac{d^{3/2}}{\epsilon})$. ~\citet{KS16} improved this upper bound by giving an adaptive unateness tester with query complexity $O(\frac{d\log d}{\eps})$. 
+
+The related properties of monotonicity, Lipschit~\cite{JR13,CS13,BlaRY14} and bounded-derivative properties~\cite{CDJS17} has been studied extensively for different types of functions in the context of property testing. The problem of testing monotonicity of Boolean functions over the hypercube domain was first introduced by \citet{GGLRS00}. It was shown in \cite{DGLRRS99,GGLRS00} that monotonicity for hypercube domain can be tested with query complexity $O(\frac{d}{\epsilon})$. A monotonicity tester with better query complexity of $\tilde{O}(\frac{d^{7/8}}{\epsilon^{3/2}})$ was introduced by \citet{CS13b}. \citet{CST14} modified the tester of \citet{CS13b} and improved the query complexity to $\tilde{O}(\frac{d^{5/6}}{\epsilon^4})$. Most recently, \citet{KMS15} improved the query complexity of the tester to $\tilde{O}(\frac{\sqrt{d}}{\epsilon^2})$. The lower bound for any nonadaptive one-sided error tester for monotonicity over the hypercube was proved to be $\Omega(\sqrt{d})$ by \citet{FLNRRS02}. Also, \citet{CDST15} gave a lower bound of almost $\Omega(\sqrt{d})$ for any nonadaptive, two-sided error tester. Moreover, there is a lower bound of $\Omega(\min\{d, |R|^2\})$ over the real-valued functions by \citet{BBM12}. Most recently, \citet{BB16} gave a lower bound of $\tilde{\Omega}(d^{\frac{1}{4}})$ for adaptive testers of Boolean functions over the hypercube. \citet{CS13} proved that any adaptive, two-sided monotonicity tester for functions $f:[n]^d\rightarrow \mathbb{N}$ must make $\Omega(\frac{d\log n- \log \eps^{-1}}{\eps})$ queries.
+
+%Testing of various properties of functions, including
+%monotonicity
+%(see, e.g., \cite{GGLRS00,DGLRRS99,EKKRV00,LR01,FLNRRS02,Fis04,HK07,AC06,HK08,BRW05,BBM12,BGJRW12,BCGM12,CS13, BlaRY14,BerRY14,CS14,CS16,CDJS17,CST14,CDST15,KMS15,BB15,BB16,DRTV16,PRV17} and recent surveys~\cite{Ras16,C16a}),
+%the Lipschitz property \cite{JR13,CS13,BlaRY14}, bounded-derivative properties~\cite{CDJS17}, and unateness~\cite{GGLRS00,KS16}, has been studied extensively over the past two decades. Even though unateness testing was initially discussed in the seminal paper
+%by Goldreich et al.~\cite{GGLRS00} that gave first testers for properties of functions,  relatively little is known about testing this property. All previous work on unateness testing focused on the special case of Boolean functions on domain $\{0,1\}^d$. The domain $\{0,1\}^d$ is called the {\em hypercube} and the more general domain $[n]^d$ is called the {\em hypergrid}.
+%Goldreich et al.~\cite{GGLRS00}
+%provided a $O(\frac{d^{3/2}}{\eps})$-query nonadaptive tester for unateness of Boolean functions on the hypercube.
+%Recently, Khot and Shinkar~\cite{KS16} improved the query complexity
+%to $O(\frac{d\log d}\eps)$, albeit with an adaptive tester.
+
+\section{Our Work}
+
+In this work, we improve previous results for unateness testing.
+
+Specifically, we show that unateness of real-valued functions on hypercubes can be tested nonadaptively with $O(\frac d \eps \log \frac d \eps)$ queries and adaptively with $O(\frac d \eps)$ queries. More generally, we describe a $O(\frac d \eps \cdot(\log\frac d\eps + \log n))$-query nonadaptive tester and a
+$O(\frac{d\log n}\eps)$-query adaptive tester of unateness of real-valued functions over hypergrids.
+
+In contrast to the state of knowledge for unateness testing, the complexity of testing monotonicity of real-valued functions over the hypercube and the hypergrid has been resolved. For constant distance parameter $\eps$, it is known to be $\Theta(d\log n)$. Moreover, this bound holds for all {\em bounded-derivative} properties~\cite{CDJS17}, a large class that includes $\bb$-monotonicity and some properties quite different from monotonicity, such as the Lipschitz property. Amazingly, the upper bound for all these properties is achieved by the same simple and, in particular, nonadaptive, tester.
+Even though proving lower bounds for adaptive testers has been challenging in general, a line of work, starting from Fischer~\cite{Fis04} and including \cite{BBM12,CS14,CDJS17}, has established that adaptivity does not help for this large class of properties. Since unateness is so closely related, it is natural to ask whether the same is true for testing unateness.
+
+We answer this in the negative: we prove that any nonadaptive tester of real valued functions over the hypercube (for some constant distance parameter) must make $\Omega(d\log d)$ queries.
+More generally, it needs $\Omega(d(\log d+\log n))$ queries for the hypergrid domain. These lower bounds complement our algorithms, completing the picture for unateness testing of real-valued functions.
+From a property testing standpoint, our results establish that unateness is different from
+monotonicity and, more generally, any derivative-bounded
+property.
+
+\section{Formal Statements and Technical Overview}
+Our testers are summarized in the following theorem, stated for functions over the hypergrid domains. (Recall that the hypercube is a special case of the hypergrid with $n=2$.)
+
+\begin{theorem}\label{thm:main-hg}
+	Consider functions $f:[n]^d \to \R$ and a distance parameter $\eps\in (0,1/2)$.
+	\begin{compactenum}
+		\item\label{item:nonadaptive} There is a nonadaptive unateness tester that makes $O(\frac d \eps(\log\frac d\eps + \log n))$ queries\footnote{\scriptsize For many properties, when the domain is extended from the hypercube to the hypergrid, testers incur an extra multiplicative factor of $\log n$ in the query complexity. This is the case for our adaptive tester.
+			 However, note that the complexity of nonadaptive unateness testing (for constant $\eps$) is $\Theta(d(\log d + \log n))$ rather than $\Theta(d\log d\log n).$}.
+		
+		\item\label{item:adaptive} There is an adaptive unateness tester  that makes $O(\frac{d\log n}\eps)$ queries.
+	\end{compactenum}
+	Both testers have one-sided error.
+\end{theorem}
+
+\noindent
+Our main technical contribution is the proof that the extra $\Omega(\log d)$ is needed for nonadaptive testers.
+This result demonstrates a gap between adaptive and nonadaptive unateness testing.
+\begin{theorem}\label{thm:non-adap-lb-1}
+	Any nonadaptive unateness tester (even with two-sided error) for real-valued functions $f:\{0,1\}^d \to \R$ with distance parameter $\eps = 1/8$  must make $\Omega(d\log d)$ queries.
+\end{theorem}
+
+\noindent The lower bound for adaptive testers is an easy adaptation of the monotonicity lower bound in~\cite{CS14}. 
+We state this theorem for completeness and prove it in Appendix~\ref{sec:adap-lb}.
+\begin{theorem}\label{thm:adap-lb}
+Any unateness tester  for functions $f:[n]^d \to \R$ with distance parameter $\eps \in (0,1/4)$ must make $\Omega\left(\frac{d \log n}{\eps}-\frac{\log 1/\eps}{\eps}\right)$ queries.
+\end{theorem}
+Theorems~\ref{thm:non-adap-lb-1} and \ref{thm:adap-lb} directly imply that our nonadaptive tester is optimal for constant $\eps$, even for the hypergrid domain. The details appear in Appendix~\ref{sec:na-lb-hg}.
+
+\subsection{Overview of Techniques}\label{sec:intro-tech}
+We first consider the hypercube domain. For each $i\in[d],$ an {\em $i$-edge} of the hypercube is a pair $(x,y)$ of points in $\{0,1\}^d$, where $x_i=0,y_i=1$, and $x_j=y_j$ for all $j\in([d] \setminus \{i\})$. Given an input function $f:\{0,1\}^d\to\R$, we say an $i$-edge $(x,y)$ is {\em increasing} if $f(x)<f(y)$, {\em decreasing} if $f(x)>f(y),$ and {\em constant} if $f(x)=f(y)$.
+
+Our nonadaptive unateness tester on the hypercube uses the work investment strategy from~\cite{BerRY14} (also refer to Section 8.2.4 of Goldreich's book~\cite{Go-book}) to ``guess'' a good dimension where to look for violations of unateness (specifically, both increasing and decreasing edges).  For all $i\in[d]$, let $\alpha_i$ be the fraction of the $i$-edges that are decreasing, $\beta_i$ be the fraction of the $i$-edges that are increasing, and $\mu_i = \min(\alpha_i,\beta_i)$. The dimension reduction theorem from~\cite{CDJS17} implies that if the input function is $\eps$-far from unate, then the average of $\mu_i$ over all dimensions is at least $\frac\eps{4d}$. If the tester knew which dimension had $\mu_i=\Omega(\eps/d)$, it could detect a violation with high probability by querying the endpoints of $O(1/\mu_i)=O(d/\eps)$ uniformly random edges.
+However, the tester does not know which $\mu_i$ is large
+and, intuitively, nonadaptively checks the following
+$\log d$ different scenarios, one for each $k\in[\log d]$: exactly $2^k$ different
+$\mu_i$'s are $\eps/2^k$, and all others are $0$. This leads to the query complexity of $O(\frac {d\log d}\eps).$
+
+With adaptivity, this search  through $\log d$ different scenarios is not required.
+A pair of queries in each dimension detects influential coordinates (i.e., dimensions with many non-constant edges), and the algorithm focuses
+on finding violations among those coordinates. This leads to the query complexity of $O(d/\eps)$, removing the $\log d$ factor.
+
+It is relatively easy to extend (both adaptive and nonadaptive) testers from hypercubes to hypergrids by incurring an extra factor of $\log n$ in the query complexity. The role of $i$-edges is now played by {\em $i$-lines}. An $i$-line is a set of $n$ domain points that differ only on coordinate $i$. The domain $[n]$ is called a line. Monotonicity on the line (a.k.a. sortedness) can be tested with $O(\frac{\log n}\eps)$ queries, using, for example, the classical {\em tree tester} from \cite{EKKRV00}. Instead of sampling a random $i$-edge, we sample a random $i$-line $\ell$ and run the tree tester on the restriction $f_{|\ell}$ of function $f$ to the line $\ell$.
+This is optimal for adaptive testers, but, interestingly, not for nonadaptive testers.
+We show that for each function $f$ on the line that is $\eps$-far from unateness, one of the two scenarios happen: (1) the tree tester is likely to find a violation of unateness; (2) function $f$ is increasing (and also decreasing) on a constant fraction of pairs in $[n]$. This new angle on the classical tester allows us to replace the factor $(\log d)(\log n)$ with $\log d + \log n$ in the query complexity.
+Thus, the nonadaptive complexity becomes $O(d(\log d + \log n))$, which we show is optimal.
+
+\subsection{The nonadaptive lower bound}
+Our most significant finding is the $\log d$ gap in the query complexity between adaptive and nonadaptive testing of unateness.
+By previous work~\cite{Fis04,CS14}, it suffices to prove lower bounds for {\em comparison-based} testers, i.e., testers that
+can only perform comparisons of the function values at queried points, but cannot use the values themselves.
+Our main technical contribution is the $\Omega(d\log d)$ lower
+bound for nonadaptive comparison-based testers of unateness on hypercube domains.
+
+Intuitively, we wish to construct $K=\Theta(\log d)$ families of functions where,
+for each $k \in [K]$, functions in the $\ord{k}$ family have
+$2^k$ dimensions $i$ with $\mu_i=\Theta(1/2^k)$, while $\mu_i=0$ for all other dimensions.
+What makes the construction challenging is the existence of a \emph{single, universal} nonadaptive
+$O(d)$-tester for all
+$\bb$-monotonicity properties, proven in~\cite{CDJS17}. In other words, there is a single
+distribution on  $O(d)$ queries that defines a nonadaptive property tester for
+$\bb$-monotonicity, regardless of $\bb$.
+Since unateness
+is the union of all $\bb$-monotonicity properties,
+our construction must be able to fool such algorithms.
+Furthermore, nonadaptivity must be critical, since
+we obtained a $O(d)$-query adaptive tester for unateness.
+
+Another obstacle is that once a tester finds a non-constant edge in each dimension, the problem reduces to testing $\bb$-monotonicity for a vector $\bb$ determined by the directions (increasing or decreasing) of the non-constant edges. That is, intuitively, most edges in our construction must be constant. This is one of the main technical challenges. The previous lower bound constructions for monotonicity testing \cite{BBM12,CS14} crucially used the fact that all edges in the hard functions were non-constant.
+
+We briefly describe how we overcome the problems mentioned above.
+By Yao's minimax principle, it suffices to construct $\Yes$ and $\No$ distributions that
+a deterministic nonadaptive tester cannot distinguish.
+First, for some parameter $m$, we partition the hypercube into $\totcube$ subcubes based of the first $\log_2\totcube$ most significant coordinates.
+Both distributions, $\Yes$ and $\No$, sample a uniform $k$ from $[K]$, where $K=\Theta(\log d)$, and a set $R\subseteq[d]$ of cardinality $2^k$.
+Furthermore, each subcube $j\in [\totcube]$ selects an ``action dimension'' $r_j\in R$ uniformly at random. For both distributions, in any particular subcube $j$, the function value is completely determined by the coordinates {\em not in} $R$, and the random coordinate $r_j\in R$. Note that all the $i$-edges for $i\in (R\setminus \{r_j\})$ are constant.
+Within the subcube, the function is a linear function
+with exponentially increasing coefficients.
+In the $\Yes$ distribution, any two cubes $j,j'$ with the same action dimension orient the edges in that dimension the same  way (both increasing or both decreasing), while in the $\No$ distribution each cube decides on the orientation independently.
+The former correlation maintains unateness while the  latter independence creates distance to unateness.
+We prove that to distinguish the distributions,
+any comparison-based nonadaptive tester must find two distinct subcubes
+with the same action dimension $r_j$ and, furthermore, make a specific
+query (in both) that reveals the coefficient of $r_j$.
+We show that, with $o(d\log d)$ queries, the probability of this event is negligible.

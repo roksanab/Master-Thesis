@@ -1,0 +1,60 @@
+\Appendix{Missing Details from the Main Body}
+
+\section{The Lower Bound for Adaptive Testers over Hypergrids} \label{sec:adap-lb}
+We show that every unateness tester for functions $f:[n]^d \mapsto \R$  requires $\Omega\left(\frac{d \log n}{\eps}-\frac{\log 1/\eps}{\eps}\right)$ queries for $\eps\in(0,1/4)$ and prove Theorem~\ref{thm:adap-lb}.
+
+\begin{proof}[Proof of Theorem~\ref{thm:adap-lb}]
+By Yao's minimax principle and the reduction to testing with comparison-based testers from~\cite{Fis04,CS14} (stated for completeness in Theorem~\ref{thm:CS14}), it is sufficient to give a hard input distribution on which every deterministic comparison-based tester fails with probability more than 2/3. We use the hard distribution constructed  by Chakrabarty and Seshadhri~\cite{CS14} to prove the same lower bound for testing monotonicity. Their distribution is a mixture of two distributions, $\Yes$ and $\No,$ on positive and negative instances, respectively. Positive instances for their problem are functions that are monotone and, therefore, unate; negative instances are functions that are $\eps$-far from monotone. We show that their $\No$ distribution is supported on functions that are $\eps$-far from unate, i.e., negative instances for our problem. Then the required lower bound for unateness follows from the fact that every deterministic comparison-based tester needs the stated number of queries to distinguish $\Yes$ and $\No$ distributions with high enough probability.
+
+We start by describing the $\Yes$ and $\No$ distribution used in \cite{CS14}. We will define them as distributions on functions over the hypercube domain. Next, we explain how to convert functions over hypercubes  to functions over hypergrids.
+
+Without loss of generality, assume $n$ is a power of $2$ and let $\ell := \log_2 n$.
+% Assume $[n]$ to be $\{0,1,\ldots, n-1\}$.
+For any $z \in [n]$, let $bin(z)$ denote the binary representation of $z-1$ as an $\ell$-bit vector $(z_1, \ldots, z_\ell)$, where $z_1$ is the least significant bit.
+
+We now describe the mapping used to convert functions on hypergrids to functions on hypercubes. Let $\phi:[n]^d \to \{0,1\}^{d\ell}$ be the mapping that takes $y\in[n]^d$ to the concatenation of $bin(y_1),\dots,bin(y_d)$. Any function $f:\{0,1\}^{d \ell} \mapsto \R$ can be easily converted into a function $\widetilde{f}:[n]^d \mapsto \R$, where $\widetilde{f}(y) := f(\phi(y))$.
+
+Let $m:= d\ell$. For $x \in \{0,1\}^m$, let $\texttt{val}(x) = \sum\nolimits_{i=1}^m x_i 2^{i-1}$ denote the value of the binary number represented by vector $x$. For simplicity, assume $1/\eps$ is a power of $2$.
+Partition the set of points $x \in \{0,1\}^m$ according to the most significant $\log(1/2\eps)$ dimensions.
+That is, for $k \in \{1,2,\ldots, 1/2\eps\}$, let
+$$S_k := \{x: \texttt{val}(x) \in [(k-1)\cdot \eps 2^{m+1}, k\cdot\eps 2^{m+1} - 1]\}.$$
+The hypercube is partitioned into $1/2\eps$ sets $S_k$ of equal size, and each $S_k$ forms a subcube of dimension $m' = m - \log(1/\eps) + 1$.
+
+We now describe the $\Yes$ and $\No$ distributions for functions on hypercubes.
+The $\Yes$ distribution consists of a single function $f(x) = 2 \texttt{val}(x)$.
+The $\No$ distribution is uniform over $m'/2\eps$ functions $g_{j,k}$, where $j \in [m']$ and $k \in [1/2\eps]$, defined as follows:
+\begin{align*}
+    g_{j,k}(x) =
+    \begin{cases}
+        2\texttt{val}(x) - 2^j - 1 &\text{ if } x_j = 1 \text{ and } x \in S_k;\\
+        2\texttt{val}(x), &\text{ otherwise.}
+    \end{cases}
+\end{align*}
+To get the $\Yes$ and $\No$ distributions for the hypergrid, we convert $f$ to $\widetilde{f}$ and each function $g_{j,k}$ to $\widetilde{g_{j,k}}$, using the transformation defined before.
+
+
+Chakrabarty and Seshadhri~\cite{CS14} proved that $f$ is monotone and each function $\widetilde{g_{j,k}}$  is $\eps$-far from monotone. It remains to show that functions $\widetilde{g_{j,k}}$ are also $\eps$-far from unate.
+
+\begin{claim}
+Each function $\widetilde{g_{j,k}}$ is $\eps$-far from unate.
+\end{claim}
+
+\begin{proof}
+To prove that $\widetilde{g_{j,k}}$ is $\eps$-far from unate, it suffices to show that there exists a dimension $i$, such that there are at least $\eps 2^{d\ell}$ increasing $i$-pairs and at least $\eps 2^{d\ell}$ decreasing $i$-pairs w.r.t.\ $\widetilde{g_{j,k}}$ and that all of these $i$-pairs are disjoint. Let $u,v \in [n]^d$ be two points such that $\phi(u)$ and $\phi(v)$ differ only in the $\ord{j}$ bit. Clearly, $u$ and $v$ form an $i$-pair, where $i =\lceil j/\ell \rceil$. Now, if $\phi(u),\phi(v) \in S_k$ and $u \prec v $, then $\widetilde{g_{j,k}}(v) = \widetilde{g_{j,k}}(u) - 1$. So, the $i$-pair $(u,v)$ is decreasing. The total number of such $i$-pairs is  $2^{d\ell - \log(1/2\eps) - 1} = \eps 2^{d\ell}$. If $\phi(u),\phi(v) \in S_{k'}$ where $k' \neq k$, then the $i$-pair $(u,v)$ is increasing. Clearly, there are at least $\eps 2^{d\ell}$ such $i$-pairs. All the $i$-pairs we mentioned are disjoint.
+Hence, $\widetilde{g_{j,k}}$ is $\eps$-far from unate.
+\end{proof}
+This completes the proof of Theorem~\ref{thm:adap-lb}.
+\end{proof}
+
+\section{The Lower Bound for Nonadaptive Testers over Hypergrids}\label{sec:na-lb-hg}
+The lower bound for nonadaptive testers over hypergrids follows from a combination of the lower bound for nonadaptive testers over hypercube and the lower bound for adaptive testers over hypergrids.
+
+\begin{theorem}
+Any nonadaptive unateness tester (even with two-sided error) for real-values functions $f:[n]^d \mapsto \R$ must make $\Omega(d(\log n + \log d))$ queries.
+\end{theorem}
+\begin{proof}
+Fix $\eps = 1/8$. The proof consists of two parts. The lower bound for adaptive testers is also a lower bound for nonadaptive tester, and so, the bound of $\Omega(d \log n)$ holds.
+Next, we extend the $\Omega(d \log d)$ lower bound for hypercubes.
+Assume $n$ to be a power of $2$. Define function $\psi:[n] \mapsto \{0,1\}$ as $\psi(a):= \mathbbm{1}[a > n/2]$ for $a \in [n]$. For $x = (x_1, x_2, \ldots, x_d) \in [n]^d$, define the mapping $\Psi: [n]^d \mapsto \{0,1\}^d$ as $\Psi(x) := (\psi(x_1), \psi(x_2), \ldots, \psi(x_d))$. Any function $f:\{0,1\}^d \mapsto \R$ can be extended to $\tilde{f}:[n]^d \mapsto \R$ using the mapping $\tilde{f}(x) = f(\Psi(x))$ for all $x \in [n]^d$. The proof of Theorem~\ref{thm:non-adap-lb} goes through for hypergrids as well, and so we have an $\Omega(d \log d)$ lower bound. Combining the two lower bounds, we get a bound of $\Omega(d \cdot \max\{\log n, \log d\})$, which is asymptotically equal to $\Omega(d(\log n + \log d))$.
+\end{proof}
+\end{document}

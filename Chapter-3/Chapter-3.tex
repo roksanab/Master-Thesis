@@ -1,0 +1,605 @@
+\chapter{Lower Bounds}
+
+\section{The Lower Bound for Nonadaptive Testers over Hypercubes} \label{sec:lb}
+In this section, we prove \Thm{non-adap-lb-1}, which gives a lower bound for nonadaptive unateness testers for functions over the hypercube.
+
+Fischer~\cite{Fis04} showed that in order to prove lower bounds for a general class of properties on the line domain, it is sufficient to consider a special class of testers called {\em comparison-based testers}. The properties he looked at are called {\em order-based properties} (see \Def{obp}) and they include monotonicity and unateness.
+A tester is {\em comparison-based} if it bases its decisions only on the {\em order} of the function values at the points it queried,  and not on the values themselves.
+Chakrabarty and Seshadhri~\cite{CS14} extended Fischer's proof to monotonicity on any partially-ordered domain. As we show in \Sec{reduction-cbt} below, Chakrabarty and Seshadhri's proof goes through for all order-based properties on partially-ordered domains. We include this proof for completeness, filling in the details needed to generalize the original proof.
+
+Our main technical contribution is the construction of a distribution of functions $f:\{0,1\}^d \to \R$ on which every nonadaptive comparison-based tester must query $\Omega(d \log d)$ points to determine whether the sampled function is unate or far from unate.
+We describe this construction in \Sec{hard-dist} and show its correctness in Sections~\ref{sec:f-graph}-\ref{sec:bad}.
+
+%New section on COmparison based testers reduction
+\subsection{Reduction to Comparison-Based Testers}\label{sec:reduction-cbt}
+In this section, we prove that if there exists an $\eps$-tester for an order-based property of functions over a partially-ordered domain, then there exists a comparison-based $\eps$-tester for the same property making the same number of queries. This is stated in \Thm{CS14}.
+Before stating the theorem, we introduce several definitions.
+
+\begin{definition} \label{def:t-eps-del-tester}
+A $(t,\eps,\delta)$-tester for a property is a ($2$-sided error) $\eps$-tester making at most $t$ queries, that errs with probability at most $\delta$.
+\end{definition}
+
+\begin{definition}[Order-based property]\label{def:obp}
+For an arbitrary partial order $D$ and an arbitrary total order $R$, a property $\cP$ of functions $f:D \to R$ is {\em order-based} if,
+for all strictly increasing maps $\phi: R \to R$ and all functions $f$, we have $\dist(f,\cP) = \dist(\phi\circ f, \cP)$.
+\end{definition}
+
+\noindent Specifically, unateness is an order-based property.
+The following theorem is an extension of Theorem~5 in~\cite{Fis04} and Theorem~2.1 in~\cite{CS14}.
+In particular, Theorem~2.1 in~\cite{CS14} was proved with the assumption that the function values are distinct. We generalize 
+%Theorem~2.1 in~\cite{CS14}
+the theorem
+by removing this assumption.
+
+\begin{theorem}[implicit in~\cite{Fis04,CS14}]\label{thm:CS14}
+Let $\cP$ be an order-based property of functions $f:D \to \N$. Suppose there exists a $(t,\eps,\delta)$-tester for $\cP$.
+Then there exists a comparison-based $(t,\eps,2\delta)$-tester
+for $\cP$.
+\end{theorem}
+
+The rest of this section is devoted to proving \Thm{CS14}.
+Our proof closely follows the proof of Theorem~2.1 in~\cite{CS14}.
+The proof has two parts. In the first part, we describe a reduction from a tester to a {\em discretized tester} and, in the second part, we describe a reduction from a discretized tester to a comparison-based tester.
+
+Let $\cP$ be a property of functions $f:D \to R$ for an arbitrary partial order $D$ and an arbitrary total order $R \subseteq \N$. Let $\cT$ be a $(t,\eps,\delta)$-tester for $\cP$. First, we define a family of probability functions that completely characterizes $\cT$. Fix some $s \in [t]$. Consider the point in time in an execution of the tester $\cT$ on some input function $f$, where exactly $s$ queries have been made. 
+Suppose these queries are $x_1, x_2, \ldots, x_s \in D$ and the corresponding answers are $a_1=f(x_1), a_2=f(x_2), \ldots, a_s=f(x_s)$. 
+Let {\em query vector} $X$ be $(x_1, \ldots, x_s)$ and {\em answer vector} $A$ be $(a_1, \ldots, a_s)$. The next action of the algorithm is either choosing the $\ord{(s+1)}$ query from $D$ or outputting {\em accept} or {\em reject}. For each action $y \in D \cup \{\texttt{accept}, \texttt{reject}\}$, let $p_X^y(A)$ denote the probability that $\cT$ chooses action $y$ after making queries $X$ and receiving answers $A$. Since $p_X^y(A)$ is a probability distribution,
+$$\forall s < t, \forall X \in D^s, \forall A \in R^s \sum_{y \in D \cup \{\texttt{accept}, \texttt{reject} \}} p_X^y(A) = 1.$$
+Furthermore, the tester cannot make more than $t$ queries,
+and so the action $(t+1)$ must be either \texttt{accept} or \texttt{reject}. Formally,
+$$\forall X \in D^t, \forall A \in R^t \sum_{y \in \{\texttt{accept}, \texttt{reject} \}} p_X^y(A) = 1.$$
+
+\begin{definition} [Discretized tester] \label{def:disc}
+A tester $\cT$ is {\em discretized} if all $p_X^y(A)$-values associated with $\cT$ come from the range $\left\{ \frac{i}{K}: i\in \{0,1,\ldots,K\} \right\}$ for some integer $K$.
+\end{definition}
+
+Chakrabarty and Seshadhri~\cite{CS14} proved that if there exists a $(t,\eps,\delta)$-monotonicity tester $\cT$ for functions $f:D \to \N$, then there exists a discretized $(t,\eps,2\delta)$-monotonicity tester $\cT'$ for the same class of functions.
+Both the statement and the proof in~\cite{CS14} hold not only for testers of monotonicity, but for testers of all properties of functions $f:D \to R$.
+
+\begin{lemma}[implicit in~{\cite[Lemma~2.2]{CS14}}] \label{lem:disc-test}
+Suppose there exists a $(t,\eps,\delta)$-tester $\cT$ for a property $\cP$ of functions $f:D \to R$.
+Then, there exists a $(t,\eps,2\delta)$-discretized tester $\cT'$ for $\cP$.
+\end{lemma}
+
+\noindent This completes the first part of the proof.
+
+Next, we will show how to transform a discretized tester into a comparison-based tester.
+Intuitively, a tester is comparison-based if each query of the tester depends only on the ordering of the answers to the previous queries, not on the values themselves.
+We define a family of probability functions $q$ in order to characterize comparison-based testers.
+The $q$-functions are defined in terms of $p$-functions, but, in their definition, we decouple the set of values that were received as answers from their positions in the answer vector.
+Let $V$ represent the set $\{a_1, \ldots, a_s\}$ of answer values (without duplicates).
+Let $r$ be the number of (distinct) values in $V$. Note that $r \leq s$.
+Suppose, $V$ is $\{v_1, v_2, \ldots, v_r\}$ where $v_1, \ldots, v_r \in R$ and $v_1 < v_2 < \ldots < v_r$.
+Let $\rho$ be the map from positions of values in the answer vector to their corresponding indices in $V$, that is, $\rho:[s] \to [r]$. Observe that $\rho$ is surjective.
+The $q$-functions are defined as follows:
+$$q_{X,\rho}^y(V) = p_X^y((v_{\rho(1)}, v_{\rho(2)}, \ldots,v_{\rho(s)})).$$
+%Similar to $p$-functions, the $q$-functions also have as arguments, a query vector $X$ and a next action $y$.
+%Instead of receiving the vector containing answers $A$, the $q$ functions receive a set $V$ and a surjection $\rho$ that dictates the ordering of the answers received.
+%This is where the proof differs from that of~\cite{CS14}; their proof is based on the assumption that the function values are distinct, hence, they define a permutation $\sigma$ in place of the surjection $\rho$.
+%We generalize the theorem by removing this assumption.
+%The function $q$ receives a subset of queries, sorts them in increasing order, constructs a new larger vector according to a surjective function and passes the vector to the function $p$. 
+%\new{
+%Formally we define $q$ as follows. Let $R^{(r)}$ denote 
+%the set of all unordered subsets of $R$ of size $r$. Let $X \in D^s$ be a query vector of size $s \geq r$, function $\rho:[s] \to [r]$ be surjective and $y \in D \cup \{\texttt{accept}, \texttt{reject}\}$ be an action. We define $q_{X,\rho}^y: R^{(r)} \to [0,1]$ with the semantics,
+%$$ \text{for any set } V = (v_1 < v_2 < \ldots < v_r) \in R^{(r)}, \ \ \  $$}
+%\new{Now, we formally define comparison-based testers.}
+%We introduce a new family of functions. For all vectors $X \in D^s$, queries $y \in D \cup \{\texttt{acc}, \texttt{rej}\}$, sets $V \in R^{(r)}$ and all surjective functions $\rho:[s] \to [r]$ such that $r \leq s$, define $q_{X,\rho}^y: R^{(r)} \to [0,1]$ with the semantics,
+%$$ \text{for any set } V = (v_1 < v_2 < \ldots < v_r) \in R^{(r)}, \ \ \  q_{X,\rho}^y(V) = p_X^y((v_{\rho(1)}, v_{\rho(2)}, \ldots,v_{\rho(s)})).$$
+%In other words, $q_{X,\rho}^y$ receives a subset of $R$ of size $r$, sorts them in increasing order, constructs a vector of size $s$ according to the surjection $\rho$ and passes the vector to $p_X^y$.
+%Since $\rho$ is surjective, all elements in $V$ appear at least once in the vector.
+%Now, using these $q$ functions, we can define comparison-based testers.
+
+\noindent Let $R^{(r)}$ denote the set of all subsets of $R$ of size $r$.
+
+\begin{definition} [Comparison-based tester]\label{def:cbt}
+A tester $\cT$ for an order-based property $\cP$ is {\em comparison-based} for functions $f:D \to R$, if for all $r,s$ satisfying $ r \leq s \leq t$, and all $X \in D^s$, $y \in D \cup \{\texttt{accept}, \texttt{reject}\}$ and surjections $\rho:[s] \to [r]$, the function $q_{X,\rho}^y$ is constant on $R^{(r)}$. That is, for all $V, V' \in R^{(r)}$, we have $q_{X,\rho}^y(V) = q_{X,\rho}^y(V')$.
+\end{definition}
+
+%\noindent In other words, a tester is comparison-based if the $\ord{(s+1)}$ query of the tester depends only on the ordering of the answers of the first $s$ queries, not on the values themselves.
+
+%\new{
+%\begin{lemma}\label{lem:disc-to-comp}
+%For any discretized tester $\cT'$ for an order-based property $\cP$ over the functions $f:D \to \N$, there exists an infinite set $R \subseteq \N$ such that, on functions $f:D \to R$, the tester $\cT'$ behaves as a comparison-based tester.
+%\end{lemma}}
+%
+%\begin{proof}
+%\new{
+%The proof of existence of the infinite set $ R \subseteq \N$ is done through Ramsey theory arguments. So first we introduce some Ramsey theory terminology. For any positive integer $i$, a {\em finite coloring} of $\N^{(i)}$ is a function $\texttt{col}_i:\N^{(i)} \to [C]$ for a finite $C$, where $[C]$ represents a set of colors. An infinite set $Z \subseteq \N$ is {\em monochromatic} with respect to $\texttt{col}_i$ if for all $i$-sized subsets $U, V \in Z^{(i)}$ we have $\texttt{col}_i(U) = \texttt{col}_i(V)$. A $k$-wise finite coloring of $\N$, for a positive integer $k$, is a collection of $k$-colorings $\texttt{col}_1, \texttt{col}_2, \ldots, \texttt{col}_k$, where each coloring is over subsets of different sizes.
+%An infinite subset $Z \subseteq \N$ is $k$-wise monochromatic if $Z$ is monochromatic with respect to all $\texttt{col}_i$'s, such that $i$ is a positive integer.}
+%\end{proof}
+
+\noindent To complete the proof of \Thm{CS14}, we show that if there exists a discretized tester $\cT$ for an order-based property $\cP$ over the functions $f:D \to \N$, then there exists an infinite set $R \subseteq \N$ such that, for functions $f:D \to R$, the tester $\cT$ is comparison-based.
+The existence of this infinite set $R$ is proved using Ramsey theory arguments.
+
+We introduce some Ramsey theory terminology. 
+Consider an integer $C$, where $[C]$ represents a set of colors.
+For any positive integer $i$, a {\em finite coloring} of $\N^{(i)}$ is a function $\texttt{col}_i:\N^{(i)} \to [C]$.
+An infinite set $R \subseteq \N$ is {\em monochromatic} with respect to $\texttt{col}_i$ if for all $i$-sized subsets $V, V' \in R^{(i)}$, the color $\texttt{col}_i(V) = \texttt{col}_i(V')$. A {\em $k$-wise finite coloring of $\N$} is a collection of $k$-colorings $\texttt{col}_1, \texttt{col}_2, \ldots, \texttt{col}_k$.
+Note that each coloring $\texttt{col}_1, \ldots, \texttt{col}_k$ is defined over subsets of different sizes.
+An infinite subset $R \subseteq \N$ is {\em $k$-wise monochromatic} \new{with respect to $col_1, \ldots, col_k$} if $R$ is monochromatic with respect to all $\texttt{col}_i$ for $i \in [k]$.
+
+We use the following variant of Ramsey's theorem which was also used in~\cite{Fis04,CS14}.
+
+\begin{theorem}[Theorem~2.3 in~\cite{CS14}]\label{thm:ramsey}
+For any $k$-wise finite coloring of $\N$, there exists an infinite $k$-wise monochromatic subset $R \subseteq \N$.
+\end{theorem}
+
+
+\begin{proof}[Proof of \Thm{CS14}]
+Suppose there exists a $(t,\eps,\delta)$-tester for property $\cP$ of functions $f:D \to \N$. By \Lem{disc-test}, there exists a $(t,\eps,2\delta)$-discretized tester $\cT$ for $\cP$. \new{Special name for family of $q$ functions?} Let 
+$q$ %$q_{X, \rho}^y$ 
+be the family of probability functions that characterizes $\cT$.
+
+We define a $t$-wise finite coloring of $\N$. For each $r \in [t]$ and $V \in \N^{(r)}$, the color $\texttt{col}_r(V)$ is defined as a vector of probability values $q_{X,\rho}^y(V)$. 
+\new{The vector is indexed by $(y, X, \rho)$ for each $y \in D \cup \{\texttt{accept}, \texttt{reject}\}, s$ satisfying $r \leq s \leq t$ and $X \in D^s$ and surjection $\rho:[r] \to [s]$.}
+The value at the index $(y,X,\rho)$ in $\texttt{col}_r(V)$ is equal to $q_{X, \rho}^y (V)$.
+Note that, \new{there are finitely many possible values for $y$ and $X$, and surjections $\rho$.}
+%Note that, for each $s$ satisfying $r \leq s \leq t$,
+%the number of different values that $y$ takes, the size of $D^s$ and the number of possible surjections $\rho$ are all finite.
+So, the dimension of the vector $\texttt{col}_r(V)$ is finite. Furthermore, since the tester is discretized, the number of different values that the $q$-functions take is also finite. Hence, the range of $\texttt{col}_r$ is finite.
+Now, we have a $t$-wise finite coloring $\texttt{col}_1, \ldots, \texttt{col}_t$ of $\N$. 
+By \Thm{ramsey}, there exists an infinite $t$-wise monochromatic set $R \subseteq \N$.
+Thus, for each $r \in [t]$ and $V, V' \in R^{(r)}$, we have $\texttt{col}_r(V) = \texttt{col}_r(V')$, implying that $q_{X,\rho}^y (V) = q_{X,\rho}^y (V')$ for all $y, X, \rho$. Thus, $\cT$ is comparison-based for functions $f:D \to R$.
+
+Consider a strictly monotone increasing map $\phi: \N \to R$. Given any function $f: D \to \N$, consider $\phi \circ f: D \to R$. 
+Define an algorithm $\cT'$, which on input $f$, runs $\cT$ on $\phi \circ f$.
+Since $\cP$ is order-based, $\text{dist}(f, \cP) = \text{dist}(\phi \circ f, \cP)$. 
+Hence, $\cT'$ is a $(t,\eps, 2\delta)$-tester for $\cP$.
+%As $\cT'$ runs $\cT$ on $\phi \circ f:D \to R$ , and $\cT$ is comparison based on the range $R$.
+%Hence, $\cT'$ is a comparison-based tester.
+\new{Moreover, since the tester $T'$ just runs $T$ on a input $\phi \circ f: D \to R$ as a subroutine and $\cT$ is comparison-based for that input, the tester $\cT'$ is also comparison-based.}
+\end{proof}
+
+
+\subsection{The Hard Distributions} \label{sec:hard-dist}
+Our main lower bound theorem is stated next. \new{Together with \Thm{CS14}}, it implies Theorem~\ref{thm:non-adap-lb-1}.
+
+\begin{theorem}\label{thm:non-adap-lb}
+Any nonadaptive comparison-based unateness tester of functions $f:\{0,1\}^d\to \R$ must make $\Omega(d\log d)$ queries.
+\end{theorem}
+
+\noindent \new{The proof of \Thm{non-adap-lb} is presented in Sections~\ref{sec:hard-dist}-\ref{sec:bad} and forms the core technical content of this work.}
+
+By \Thm{CS14} and Yao's minimax principle~\cite{Yao77}, it suffices to prove
+the lower bound for deterministic, nonadaptive, comparison-based testers over a known distribution of functions.
+It may be useful for the reader to recall the  sketch of the main ideas given in Section~\ref{sec:intro-tech}.
+For convenience, assume $d$ is a power of $2$ and let $d' := d+\log_2d$.
+We will focus on functions $h:\{0,1\}^{d'} \to \R$,
+and prove the lower bound of $\Omega(d \log d)$ for this class of functions,
+as $\Omega(d \log d) = \Omega(d' \log d')$.
+
+
+We partition $\{0,1\}^\dd$ into $d$ subcubes based on the most significant $\log_2 d$ bits.
+Specifically, for $i \in [d]$, the $\ord{i}$ subcube is defined as
+\[C_i := \{x\in \{0,1\}^\dd: \dec(x_{d'}x_{d'-1}\cdots x_{d+1}) = i - 1\},\]
+where $\dec(z) := \sum_{i = 1}^p z_i 2^{i-1}$ denotes the integer equivalent of the binary string $z_p z_{p-1} \ldots z_1$.
+
+Let $m=d$. We denote the set of indices of the subcube by $[m]$ and the set of dimensions by $[d]$.
+We use $i,j\in [m]$ to index subcubes,
+and $a,b\in [d]$ to index dimensions.
+We now define a series of random variables, where each subsequent variable may depend on the previous ones.
+\begin{compactitem}
+    \item $k$: a number picked uniformly at random from $\left[\frac{1}{2}\log_2 d \right]$.
+    \item $R$: a uniformly random subset of $[d]$ of size $2^k$.
+    \item $r_i$: for each $i \in [m]$, $r_i$ is picked from $R$ uniformly and independently at random.
+    \item $\alpha_b$: for each $b \in [d]$, $\alpha_b$ is picked from $\{-1,+1\}$ uniformly and independently at random. (Note: $\alpha_b$ only needs to be defined for each $b \in R$. We define it over $[d]$ just so that it is independent of $R$.)
+    \item $\beta_i$: for each $i \in [m]$, $\beta_i$ is picked from $\{-1,+1\}$ uniformly and independently at random.
+\end{compactitem}
+
+\noindent We denote the tuple $(k,R,\{r_i\})$ by $\bS$, also referred
+to as the \emph{shared randomness}. We use $\bT$ to refer
+to the entire set of random variables $(k, R, \{r_i\}, \{\alpha_b\}, \{\beta_i\})$.
+\new{
+Given $\bT$, define the functions
+\begin{align*}
+f_{\bT}(x) &:=  \sum_{b \in [d'] \setminus R} x_b 3^b + \alpha_{r_i} x_{r_i}3^{r_i}, %\textrm{ where $i$ is the subcube with } x \in C_i.
+\\
+g_{\bT}(x) &:=  \sum_{b \in [d'] \setminus R} x_b 3^b + \beta_i x_{r_i}3^{r_i} %\textrm{ where $i$ is the subcube with } x \in C_i.
+\end{align*}
+where $i$ is the subcube containing $x$, i.e., $i = \dec(x_{d'}x_{d'-1}\cdots x_{d+1}) + 1$.
+The distributions $\Yes$ and $\No$ generate $f_{\bT}$ and $g_{\bT}$, respectively.
+}
+
+In all cases, the function restricted to any subcube $C_i$ is linear.
+Consider some dimension $b \in R$. 
+\new{
+There can be several $i \in [m]$ such that $r_i = b$.}
+%$r_i$'s that are equal to $b$. 
+For $f_{\bT}$, in all of these subcubes,
+the coefficient of $x_{r_i}$ has the same sign, namely $\alpha_{r_i}$. % and this makes all these functions unate.
+For $g_{\bT}$, the coefficient $\beta_i$ is potentially different,
+as it depends on the actual subcube.
+
+\noindent We write $f \sim \cD$ to denote that $f$ is sampled from distribution $\cD$.
+
+\begin{claim}\label{clm:yes}
+Every function $f \sim \Yes$ is unate.
+\end{claim}
+
+\begin{proof}
+\new{Fix some $f \in \supp(\Yes)$. Since $f_{|C_i}$ is linear,
+it suffices to argue that, for any $b \in [d']$, the coefficient of $x_b$ (when it is non-zero) has the same sign in all subcubes.
+When $b \in [d'] \setminus R$, the coefficient of $x_b$ is always $3^b$. 
+If $b \in R$, then the coefficient is either $0$ or $3^b\alpha_b$.}
+\end{proof}
+
+\begin{claim}\label{clm:no}
+A function $g \sim \No$ is $\frac{1}{8}$-far from unate with probability at least $ 9/10$.
+\end{claim}
+
+\begin{proof}
+	Note that $|R| \leq \sqrt{d}$.
+	For any $r \in R$, let $A_r := \{ i : r_i = r \}$, the set of subcube indices with $r_i = r$.	
+	Observe that $\EX[|A_r|] \geq m/\sqrt{d} = \sqrt{d}$. By Chernoff bound and union bound, for all $r \in R$,
+	we have $|A_r| \geq \sqrt{d}/2$	with probability at least $1 - d\exp(-\sqrt{d}/8)$.
+	
+	Condition on the event that $|A_r| \geq \sqrt{d}/2$ for all $r \in R$.
+	For each $i \in A_r$, there is a random choice of $\beta_i$.
+	Partition $A_r$ into $A^+_r$ and $A^-_r$,
+	depending on whether $\beta_i$ is $+1$ or $-1$, respectively. Again, by a Chernoff bound
+	and union bound, for all $r \in R$, we have $\min(|A^+_r|,|A^-_r|) \geq |A_r|/4$ with probability at least $1-d\exp(-\sqrt{d}/32)$.
+	\new{Thus, we can assume that the event $\min(|A^+_r|,|A^-_r|) \geq |A_r|/4$ holds with probability at least $1-d(\exp(-\sqrt{d}/8)+\exp(-\sqrt{d}/32))$, which is at least $9/10$, for large enough $d$ and}
+	for any choice of $k$ and $R$. 
+	
+	Denote the size of any subcube $C_i$ by $s$.
+	In $g_{\bT}$, for all $i \in A^+_r$, all $r$-edges in $C_i$ are increasing, whereas, for all $j \in A^-_r$, all $r$-edges in $C_j$ are decreasing. 
+\new{To make $g_{\bT}$ unate, all these edges must have the same direction (i.e., increasing or decreasing).}
+	This requires modifying at least $\frac{s}{2} \cdot \min(|A^+_r|,|A^-_r|) \geq \frac{s|A_r|}{8}$ values in $g_{\bT}$. Summing over all $r$, we need to change at least $\frac{s}{8}\sum_r |A_r|$
+	values. Since the $A_r$'s partition the set of subcubes, this corresponds to at least a $\frac{1}{8}$-fraction of the domain.
+\end{proof}
+
+
+\subsection{From Functions to Signed Graphs that are Hard to Distinguish} \label{sec:f-graph}
+For convenience, denote $x \prec y$ if $\dec(x) < \dec(y)$. Note that $\prec$ forms a total ordering
+on $\{0,1\}^{\dd}$.
+Given $x \prec y\in \{0,1\}^\dd$ and a function $h:\{0,1\}^\dd\to \R$, define
+$\sgn_h(x,y)$ to be $1$ if $h(x) < h(y)$, $0$ if $h(x) = h(y)$,
+and $-1$ if $h(x) > h(y)$.
+
+Any deterministic, nonadaptive, comparison-based tester is defined as follows:
+It makes a set of queries $Q$ and decides whether or not the input function $h$ is unate
+depending on the $|Q|\choose{2}$-comparisons in $Q$.
+More precisely, for every pair $(x,y) \in Q \times Q$,
+$x \prec y$, we insert
+an edge labeled with $\sgn_h(x,y)$. Let this signed graph be called $G^Q_h$.
+Any nonadaptive, comparison-based algorithm can be described
+\new{as a method to partition the universe of all signed graphs over $Q$  into $\cG_Y$ and $\cG_N$.}
+%as a partition of the universe of all signed graphs over $Q$  into $\cG_Y$ and $\cG_N$.
+The algorithm accepts the function $h$ iff $G^Q_h \in \cG_Y$.
+
+Let $\bG^Q_Y$ be the distribution of the signed graphs $G^Q_h$ when $h\sim \Yes$. Similarly, define $\bG^Q_N$ when $h\sim \No$. Our main technical theorem is \Thm{tv}, which is proved in \Sec{thm-tv-proof}.
+\begin{theorem}\label{thm:tv}
+For small enough $\delta > 0$ and large
+enough $d$, if $|Q| \leq \delta d\log d$, then $\|\bG^Q_Y - \bG^Q_N\|_{\mathrm{TV}} = O(\delta)$.
+\end{theorem}
+
+\noindent We now prove that \Thm{tv} implies \Thm{non-adap-lb}, the main lower bound.
+
+\begin{proof}[{\bf Proof of Theorem~\ref{thm:non-adap-lb}}]
+	Consider the distribution over functions where with probability $1/2$, we sample from $\Yes$ and with the remaining probability we sample from $\No$.
+	By \Thm{CS14} and Yao's minimax principle,
+it suffices to prove that any deterministic, nonadaptive, comparison-based tester making
+at most $\delta d\log d$ queries (for small enough $\delta > 0$) errs with probability at least $ 1/3$. Now, note that
+%
+\begin{align*}
+\Pr[\textrm{error}] = \frac{1}{2} \cdot \Pr_{h\sim \Yes} [G^Q_h \in \cG_N] 
+	+ \frac{1}{2} \cdot \Pr_{h\sim \No} [G^Q_h \in \cG_Y \text{ and } h \ \textrm{is $\frac{1}{8}$-far from unate}].
+\end{align*}
+
+\noindent By \Thm{tv}, the first term is at least $\frac{1}{2}\cdot \left(\Pr_{h\sim \No} [G^Q_h \in \cG_N]  - O(\delta) \right)$, and by \Clm{no},
+	the second term is at least $\frac{1}{2}\cdot \left(\Pr_{h\sim \Yes} [G^Q_h \in \cG_Y] -O(\delta) - \frac{1}{10}\right)$. Summing them up, we get
+$\Pr[\textrm{error}] \geq \frac{1}{2} - O(\delta) - \frac{1}{20}$ which is at least $\frac 1 3$ for small enough $\delta$.
+\end{proof}
+
+The proof of \Thm{tv} is naturally tied to the behavior of $\sgn_h$.
+Ideally, we would like to say that $\sgn_h(x,y)$ is almost identical
+regardless of whether $h \sim \Yes$ or $h \sim \No$. Towards this,
+we determine exactly the set of pairs $(x,y)$ that potentially
+differentiate $\Yes$ and $\No$.
+
+\begin{claim}\label{clm:inv}
+\new{For all $h \in \supp(\Yes) \cup \supp(\No), x \in C_i$ and $y \in C_j$ such that $i < j$, we have $\sgn_h(x,y) = 1$.}
+%For all $h \in \supp(\Yes) \cup \supp(\No)$, for all $x \in C_i$ and $y \in C_j$ such that $i < j$, we have $\sgn_h(x,y) = 1$.
+\end{claim}
+
+\begin{proof}
+	For any $h$, we can write $h(x)$ as $\sum_{b > d} 3^b \cdot x_b + \sum_{b \leq d} c_b(x) \cdot 3^b \cdot x_b$,
+	where $c_b: \{0,1\}^{d'} \to \{-1,0,+1\}$. Thus,
+	$h(y) - h(x) = \sum_{b > d} 3^b(y_b - x_b) + \sum_{b \leq d} 3^b(c_b(y) \cdot y_b - c_b(x) \cdot x_b)$.
+	Recall that $x \in C_i , y \in C_j$, and $j > i$. Let $q$ denote
+	the most significant bit of difference between $x$ and $y$. We have
+	$q > d$, and $y_q = 1$ and $x_q = 0$. Note that for $b \leq d$, $|c_b(y) \cdot y_b - c_b(x) \cdot x_b)| \leq 2$.
+	Thus, $h(y) - h(x) \geq 3^q - 2\sum_{b < q} 3^b > 0$.
+\end{proof}
+
+\noindent Thus, comparisons between points in different subcubes reveal no information
+about which distribution $h$ was generated from. Therefore, the ``interesting'' pairs that can distinguish whether $h \sim \Yes$ or $h \sim \No$ must lie in the same subcube.
+The next claim shows a further criterion that is needed for a pair to be interesting.
+We first define another notation \new{needed for the claim}.
+
+\begin{definition} \label{def:t} 
+For any setting of the shared randomness $\bS$,
+subcube $C_i$, and points $x,y \in C_i$, we define $\coord{i}{\bS}(x,y)$
+to be the most significant coordinate of difference (between $x,y$)
+in $([d] \setminus R) \cup \{r_i\}$.
+%that is not in $R\setminus r_i$.
+\end{definition}
+
+\noindent Note that $\bS$ determines $R$ and $\{r_i\}$.
+\new{For any $\bT$ that extends $\bS$, the restriction of both $f_{\bT}$ and $g_{\bT}$ to $C_i$ is unaffected by coordinates in $R \setminus \{r_i\}$.}
+%For any $\bT$ that extends $\bS$ and any function,
+%the restriction to $C_i$ is unaffected by the coordinates in $R \setminus r_i$.
+Thus, $\coord{i}{\bS}(x,y)$ is the first coordinate of difference that is influential
+in $C_i$.
+
+\begin{claim}\label{clm:interesting}
+Fix some $\bS$, subcube $C_i$, and points $x,y \in C_i$.
+Let $c = \coord{i}{\bS}(x,y)$, and assume $x \prec y$.
+For any $\bT$ that extends $\bS$:
+\begin{compactitem}
+    \item If $c \neq r_i$, then $\sgn_{f_{\bT}}(x,y) = \sgn_{g_{\bT}}(x,y) = 1$.
+    \item If $c = r_i$, $\sgn_{f_{\bT}}(x,y) = \alpha_{c}$ and $\sgn_{g_{\bT}}(x,y) = \beta_i$.
+\end{compactitem}
+\end{claim}
+
+\begin{proof}
+Assume $x \in C_i$.
+	Recall that $f_{\bT}(x) = \sum_{b \in [d'] \setminus R} x_b 3^b + \alpha_{r_i}\cdot x_{r_i} 3^{r_i}$ and
+	$g_{\bT}(x) = \sum_{b \in [d'] \setminus R} x_b 3^b + \beta_i \cdot x_{r_i} 3^{r_i}$.
+	
+	First, consider the case $c \neq r_i$. Thus, $c \notin R$.
+	Observe that $x_b = y_b$, for all $b > c$ such that $b \notin R$.
+	Furthermore, $x_c = 0$ and $y_c = 1$. Thus,
+	$f_{\bT}(y) - f_{\bT}(x) > 3^c - \sum_{b < c} 3^b > 0$.
+	An identical argument holds for $g_{\bT}$.
+	
+	Now, consider the case $c = r_i$. Thus,
+	$f_{\bT}(y) - f_{\bT}(x) = \alpha_c 3^c + \sum_{b < c, b \notin R}
+	(y_b - x_b) 3^b$. Using the same geometric series arguments
+	as above, $\sgn_{f_{\bT}}(x,y) = \alpha_c$.
+	By an analogous argument, we can show that $\sgn_{g_{\bT}}(x,y) = \beta_i$.
+\end{proof}
+
+\subsection{Proving Theorem~\ref{thm:tv}: Good and Bad Events} \label{sec:thm-tv-proof}
+For a given \new{set of queries} $Q$, we first identify certain ``bad'' values for $\bS$,
+%on which $Q$ could potentially distinguish between $f_{\bS}$ and $g_{\bS}$.
+on which $Q$ could potentially distinguish between \new{$f_{\bT}$ and $g_{\bT}$ for any $\bT$ that extends $\bS$}.
+We will
+prove that the probability
+of a bad $\bS$ is small for a given $Q$.
+Furthermore, we show that $Q$ cannot distinguish
+%between $f_{\bS}$ and $g_{\bS}$ for any good $\bS$.
+between \new{$f_{\bT}$ and $g_{\bT}$ for any $\bT$ that extends good $\bS$}.
+First, we set up some definitions.
+
+\begin{definition} \label{def:cap}
+	Given a pair $(x,y)$, define $\capt(x,y)$ to be the 5 most significant coordinates\footnote{There is nothing special about the constant $5$. It just needs to be sufficiently large.}
+	in which they differ.
+We say $(x,y)$ {\em captures} these coordinates.
+For any set \new{of points} $S\subseteq \{0,1\}^{\dd}$, define $\capt(S) := \bigcup_{x,y \in S} \capt(x,y)$
+to be the coordinates captured by the set $S$.
+\end{definition}
+
+\noindent Fix any $Q$. We set $Q_i := Q \cap C_i$.
+We define two bad events for $\bS$.
+\begin{itemize}
+	\item Abort Event $\cA$: There exist $x,y \in Q$ with
+    $\capt(x,y) \subseteq R$.
+	\item Collision Event $\cC$: There exist $i,j \in [d]$
+     with $r_i = r_j$, \new{such that} $r_i\in \capt(Q_i)$ and $r_j\in \capt(Q_j)$.
+\end{itemize}
+
+\noindent If $\cA$ does not occur, then for any pair $(x,y)$, the sign $\sgn_h(x,y)$ is determined by $\capt(x,y)$ for any $h\in \supp(\Yes)\cup \supp(\No)$.
+The heart of the analysis lies in \Thm{bad}, which states that the bad events happen rarely.
+\Thm{bad} is proved in~\Sec{bad}.
+
+\begin{theorem} \label{thm:bad} If $|Q| \leq \delta d\log d$,
+then $\Pr[\cA \cup \cC] = O(\delta)$.
+\end{theorem}
+
+\noindent When neither the abort nor the collision events happen,
+we say $\bS$ is good for $Q$.
+Next, we show that conditioned on a good $\bS$,
+the set $Q$ cannot distinguish $f \sim \Yes$ from $g \sim \No$.
+
+\begin{lemma}\label{lem:zero}
+For any signed graph $G$ over $Q$,
+$$\Pr_{f\sim \Yes} [G^Q_f = G|\bS \textrm{ is good}] \!=\! \Pr_{g\sim \No} [G^Q_g = G|\bS \textrm{ is good}].$$
+\end{lemma}
+\begin{proof}
+We first describe the high level ideas in the proof. As stated above, when the abort event does not happen, the sign $\sgn_h(x,y)$ is determined by $\capt(x,y)$ for any $h\in \supp(\Yes)\cup \supp(\No)$.
+Furthermore,  a pair $(x,y)$ has a possibility of distinguishing (that is, the pair is interesting) only if $x,y \in C_i$ and $r_i \in \capt(x,y)$.
+Focus on such interesting pairs. For such a pair, both $\sgn_{f_{\bT}}(x,y)$ and $\sgn_{g_{\bT}}(x,y)$ are equally likely to be $+1$ or $-1$.
+Therefore, to distinguish, we would need two interesting pairs, $(x,y) \in C_i$ and $(x',y') \in C_j$ with $i \neq j$. Note that, when $g \sim \No$,
+the signs $\sgn_{g_{\bT}}(x,y)$ and $\sgn_{g_{\bT}}(x',y')$ are independently set, whereas when $f \sim \Yes$, the signs are either the same when $r_i = r_j$, or independently set.
+But if the collision event does not occur, then $r_i \neq r_j$ for interesting pairs in different subcubes. Therefore, the probabilities are the same.
+
+Now, we prove the lemma formally.
+	Condition on a good $\bS$. Note that
+	the probability of the $\Yes$ distribution depends
+	solely on $\{\alpha_b\}$ and that of the $\No$ distribution
+	depends solely on $\{\beta_i\}$.
+	
+	Consider any pair $(x,y) \in Q\times Q$ with $x \prec y$.
+	We can classify it into three types: (i) $x$ and $y$ are in different
+	subcubes, (ii) $x$ and $y$ are both in the same subcube $C_i$, and $\coord{i}{\bS}(x,y) \neq r_i$,
+	(iii) $x$ and $y$ are both in $C_i$, and $\coord{i}{\bS}(x,y) = r_i$.
+	For convenience, we refer to the third type as {\em interesting pairs}.
+	Let $h \in \supp(\Yes | \bS) \cup \supp(\No | \bS)$.
+	For the first and second types of pairs, by \Clm{inv} and \Clm{interesting}, we have $\sgn_h(x,y) = 1$.
+	For interesting pairs, by \Clm{interesting}, $\sgn_h(x,y)$
+	must have the same label for all pairs in $Q_i \times Q_i$.
+	Thus, any $G$ whose labels disagree with the above can never
+	be $G^Q_f$ or $G^Q_g$.
+	
+	Fix a signed graph $G$. For any pair $(x,y) \in Q \times Q$, where $x \prec y$,
+	let $w(x,y)$ be the label in $G$. Furthermore, for all interesting pairs
+	%in the same $Q_i$, $w(x,y)$ has the same label, denoted $w_i$.
+	\new {within the same $Q_i$, the label $w(x,y)$ is the same and denoted by $w_i$.}
+	Let $I$ denote the set of subcubes with interesting pairs.
+	At this point, all of our discussion depends purely on $\bS$
+	and involves no randomness.
+	
+	Now we focus on $g \sim (\No|\bS)$.
+	\begin{eqnarray*}
+		\Pr_{g\sim (\No|\bS)}[G^Q_g = G]
+		& = & \Pr\Big[\bigwedge_{i \in I} \bigwedge_{\substack{x,y \in Q_i \\ \coord{i}{\bS}(x,y) = r_i}}
+		(w(x,y) = \sgn_{g_{\bT}}(x,y))\Big]  \\
+		& = & \Pr\Big[\bigwedge_{i \in I} \bigwedge_{\substack{x,y \in Q_i \\ \coord{i}{\bS}(x,y) = r_i}}
+		(w(x,y) = \beta_{i})\Big]  \ \ \ \textrm{(by \Clm{interesting})}\\
+		& = & \Pr\Big[\bigwedge_{i \in I} (w_i = \beta_{i})\Big].
+	\end{eqnarray*}
+	
+	\noindent Observe that each $\beta_{i}$ is chosen uniformly and independently at random from $\{-1,+1\}$, and so this 	probability is exactly $2^{-|I|}$.
+	
+%	The analogous expressions for $f \sim (\Yes|\bS)$ yield:
+\new{The analogous expression for $f \sim (\Yes|\bS)$ yields}
+	$$ \Pr_{f\sim (\Yes|\bS)}[G^Q_f = G] = \Pr \Big[\bigwedge_{i \in I} (w_i = \alpha_{r_i})\Big] .$$
+	\new{Notice that if multiple $r_i$'s are the same, then the individual events are not independent over different subcubes.}
+%	Note the difference here: if multiple $r_i$'s are the same, the individual events
+%	are not independent over different subcubes. 
+This is precisely what the abort and collision
+	events capture. We formally argue below.
+	
+	Consider an interesting pair $(x,y) \in Q_i \times Q_i$. Since the abort event $\cA$ does
+	not happen, $\capt(x,y) \nsubseteq R$. If $\coord{i}{\bS}(x,y) = r_i \notin \capt(x,y)$,
+	then there is a coordinate of $\overline{R}$ that is more significant than $\coord{i}{\bS}(x,y)$.
+	This contradicts the definition of the latter; so $r_i \in \capt(x,y) \subseteq \capt(Q_i)$.
+	Equivalently, a subcube index $i \in I$ iff $r_i \in \capt(Q_i)$.
+	
+	Since the collision event $\cC$ does not happen, for any $j \in [m]$ such that $r_j = r_i$, we have $r_j \notin \capt(Q_j)$. 
+	Alternately, for any $i,i' \in I$,
+ we have $r_i \neq r_{i'}$. Thus, $\Pr[\bigwedge_{i \in I}(w_i = \alpha_{r_i})]
+	= \prod_{i \in I}\Pr[w_i = \alpha_{r_i}] = 2^{-|I|}$,
+	\new{completing the proof of the lemma.}
+\end{proof}
+
+\noindent Now, we are armed to prove \Thm{tv}.
+
+\begin{proof}[Proof of \Thm{tv}]
+	Given any subset of signed graphs, $\calG$, it suffices to upper bound
+	\begin{align*}
+	\left|\Pr_{f\sim \Yes} [G^Q_f \in \calG] - \Pr_{f\sim \No} [G^Q_f \in \calG]\right|  
+	&\leq 
+    \sum_{\textrm{good } \bS} \left|\Pr[\bS]\cdot\left(\Pr_{f\sim \Yes} [G^Q_f \in \calG | \bS] - \Pr_{f\sim \No} [G^Q_f \in \calG|\bS]\right) \right| \\
+    & +  \sum_{\textrm{bad } \bS} \left|\Pr[\bS]\cdot\left(\Pr_{f\sim \Yes} [G^Q_f \in \calG|\bS] - \Pr_{f\sim \No} [G^Q_f \in \calG|\bS]\right) \right|.
+	\end{align*}
+	The first term of the RHS is $0$ by \Lem{zero}.
+    The second term is at most the probability of bad events, which is $O(\delta)$
+    by \Thm{bad}.
+\end{proof}
+
+\subsection{Bounding the Probability of Bad Events: Proof of Theorem~\ref{thm:bad}}\label{sec:bad}
+
+We prove \Thm{bad} by individually bounding $\Pr[\calA]$ and $\Pr[\calC]$.
+
+\begin{lemma}\label{lem:A}
+	If $|Q|\leq \delta d\log d$, then $\Pr[\calA] \leq d^{-1/4}$.
+\end{lemma}
+
+\begin{proof} Fix any choice of $k$ (in $\bS$).
+For any pair of points $x,y \in Q$, we have $\Pr[\capt(x,y) \subseteq R] \leq (\frac{2^k}{d-5})^5$.  Since $d-5 \geq d/2$ for all $d \geq 10$ and $k \leq (\log_2d)/2$, the probability is at most $32d^{-5/2}$.
+\new{By a union bound, $\Pr[\cA] \leq |Q \times Q| \cdot 32d^{-5/2} \leq d^{-1/4}$ for a large enough $d$}.
+%For a large enough $d$, a union
+%bound over all pairs in $Q \times Q$, which are at most $d^2\log^2d$ in number, completes the proof.
+\end{proof}
+
+\noindent 
+\new{The most challenging part of this work is bounding the probability of the collision event, which forms the heart of the lower bound.}
+%The collision event is more challenging to bound.
+%Bounding it is the heart of the lower bound.
+We start by showing that, if each $Q_i$ captures
+few coordinates, then the collision event has low probability. A critical point is the appearance of $d\log d$ in this bound.
+
+\begin{lemma}\label{lem:prob}
+If $\sum_i |\capt(Q_i)| \leq M$, then $\Pr[\cC] = O\left(\frac{M}{d\log d}\right)$.
+\end{lemma}
+
+\begin{proof} 
+	For any $r \in [d]$, 
+	define $A_r := \{j: r\in \capt(Q_j)\}$ to be the set of indices of $Q_j$'s that capture coordinate $r$.
+    Let $a_r := |A_r|$. Define $n_\ell := |\{r: a_r \in (2^{\ell-1},2^{\ell}]\}|$.
+	Observe that $\sum_{\ell \leq \log_2 d} n_\ell 2^\ell \leq 2\sum_{r\in [d]} a_r \leq 2M$.
+	
+	Fix $k$. For $r\in [d]$, we say the event $\cC_r$ occurs if
+	(a) $r \in R$, and (b) there exists $i,j\in [d]$ such that $r_i = r_j = r$, and $r_i \in \capt(Q_i)$ and $r_j\in \capt(Q_j)$. By the union
+    bound, $\Pr[\cC| k] \leq \sum_{r=1}^d \Pr[\cC_r | k]$.
+	
+	Now, we compute $\Pr[\cC_r|k]$. 
+	Only sets $Q_j$'s with $j \in A_r$ are of interest, since the others do not capture $r$.
+	Event $\cC_r$ occurs if at least two of these sets have $r_i = r_j = r$. Hence,
+\begin{align}
+\Pr[\cC_r|k] & = \Pr[r\in R]\cdot \Pr[\exists i,j\in A_r: r_i = r_j = r ~|~r\in R] \notag \\
+& = \frac{2^{k}}{d}\cdot \sum_{c \geq 2} {a_r \choose c} \left(\frac{1}{2^k} \right)^c \left(1-\frac{1}{2^k} \right)^{a_r-c}. \label{eq:007}
+\end{align}
+A fixed $r$ is in $R$ with probability ${d-1 \choose 2^k-1}/{d\choose 2^k} = \frac{2^k}{d}$.
+Given that $|R| = 2^k$, the probability that $r_i = r$ is precisely $2^{-k}$.
+
+	If $a_r \geq \frac{2^k}{4}$, then we simply upper bound \eqref{eq:007} by  $\frac{2^k}{d}$. 
+	For $a_r < \frac{2^k}{4}$, %the summation
+	we upper bound \eqref{eq:007} by
+\begin{align*}
+	\frac{2^k}{d} \left(1-\frac{1}{2^k}\right)^{a_r} \sum_{c\geq 2} \left( a_r \cdot \frac{1}{2^k} \cdot \left( 1-\frac{1}{2^k} \right)^{-1} \right)^c \leq \frac{2^k}{d} \sum_{c \geq 2} \left( \frac{a_r}{2^{k-1}} \right)^c \leq \frac{8a^2_r}{2^k d}.
+\end{align*}
+Summing over all $r$ and grouping according
+to $n_\ell$, we get
+\begin{align*}
+\Pr[\cC|k] \leq \sum_{r=1}^d \Pr[\cC_r|k] 
+\leq \sum_{r: a_r \geq 2^{k-2}} \frac{2^k}{d} + \frac{8}{d} \sum_{r: a_r < 2^{k-2}} \frac{a^2_r}{2^k} 
+\leq \frac{2^k}{d} \sum_{\ell > k-2} n_\ell + \frac{8}{d}  \sum_{\ell=1}^{k-2} n_\ell 2^{2\ell - k} .
+\end{align*}
+Averaging over all $k$, we get
+\begin{align}
+	\Pr[\cC] & = \frac{2}{\log_2 d} \sum_{k=1}^{(\log_2 d)/2}\Pr[\cC | k]   \quad \leq \quad \frac{16}{d \log_2 d} \sum_{k=1}^{(\log_2 d)/2} \left( \sum_{\ell=1}^{k-2} n_\ell 2^{2\ell - k} + \sum_{\ell > k-2} n_\ell 2^k \right) \notag \\
+	& = \frac{16}{d\log_2 d} \left(\sum_{\ell=1}^{(\log_2 d)/2} n_\ell \sum_{k \geq \ell + 2} 2^{2\ell - k} + \sum_{\ell=1}^{\log_2 d} n_\ell \sum_{k < \ell+2} 2^k  \right).\label{eq:008}
+\end{align}
+
+\noindent
+Now, $\sum_{k\geq \ell+2} 2^{2\ell - k} \leq 2^\ell$ and $\sum_{k < \ell+2} 2^k \leq 4\cdot 2^\ell$. Substituting,
+$
+\Pr[\cC] \leq \frac{80}{d\log_2 d} \sum_{\ell=1}^{\log_2 d} n_\ell 2^\ell \leq \frac{160M}{d\log_2 d}
+$, proving the lemma.
+\end{proof}
+
+\noindent We are now left to bound $\sum_i |\capt(Q_i)|$. This is done by the following combinatorial lemma.
+
+\begin{lemma}\label{lem:comb}
+Let $V$ be a set of vectors over an arbitrary alphabet
+and any number of dimensions. For any natural number $c$
+and $x,y \in V$,
+let $\capt_c(x,y)$ denote the (set of) first $c$ coordinates
+at which $x$ and $y$ differ. Then $|\capt_c(V)| \leq c(|V|-1)$.
+\end{lemma}
+
+\begin{proof}
+We construct $c$ different edge-colored graphs $G_1, \ldots, G_c$ over the vertex set $V$. 
+For every coordinate $i\in \capt_c(V)$, there must exist at least one pair of
+vectors $x,y$ such that $i \in \capt_c(x,y)$. Thinking
+of each $\capt_c(x,y)$ as an ordered set, find a pair
+$(x,y)$ where $i$ appears ``earliest'' in $\capt_c(x,y)$.
+Let the position of $i$ in this $\capt_c(x,y)$ be denoted by $t$.
+We add edge $(x,y)$ to $G_t$, and color it $i$.
+Note that the same edge $(x,y)$ cannot be added to $G_t$
+with multiple colors, and hence all $G_t$'s are simple graphs.
+Furthermore, observe that each color is present only
+once over all $G_t$'s.
+
+We claim that each $G_t$ is acyclic. Suppose not. Let there be a cycle $C$ and let $(x,y)$ be the edge in $C$ with the smallest color $i$. Clearly, $x_i \neq y_i$ since $i \in \capt_c(x,y)$. There must exist another edge $(u,v)$ in $C$
+such that $u_i \neq v_i$. Furthermore, the color of $(u,v)$
+is $j > i$. Thus, $j$ is the $\ord{t}$ entry in $\capt_c(u,v)$.
+Note that $i \in \capt_c(u,v)$ and must be the $\ord s$ entry
+for some $s < t$. But this means that the edge $(u,v)$
+colored $i$ should be in $G_s$, contradicting
+the presence of $(x,y) \in G_t$.
+\end{proof}
+
+\noindent We wrap up the bound now.
+
+\begin{lemma}\label{lem:C}
+	If $|Q|\leq \delta d\log d$, then $\Pr[\calC] = O(\delta)$.
+\end{lemma}
+\begin{proof}
+\Lem{comb} applied to each $Q_i$, yields
+$\sum_i |\capt(Q_i)| \leq 5|Q_i| = 5|Q|$.  An application of
+\Lem{prob} completes the proof.
+\end{proof}

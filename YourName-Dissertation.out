@@ -1,0 +1,24 @@
+\BOOKMARK [0][-]{chapter*.3}{Acknowledgments}{}% 1
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 2
+\BOOKMARK [1][-]{section.1.1}{Problem Definition}{chapter.1}% 3
+\BOOKMARK [1][-]{section.1.2}{Previous Works}{chapter.1}% 4
+\BOOKMARK [1][-]{section.1.3}{Our Work}{chapter.1}% 5
+\BOOKMARK [1][-]{section.1.4}{Formal Statements and Technical Overview}{chapter.1}% 6
+\BOOKMARK [2][-]{subsection.1.4.1}{Overview of Techniques}{section.1.4}% 7
+\BOOKMARK [2][-]{subsection.1.4.2}{The nonadaptive lower bound}{section.1.4}% 8
+\BOOKMARK [0][-]{chapter.2}{Upper Bounds}{}% 9
+\BOOKMARK [1][-]{section.2.1}{The Nonadaptive Tester over the Hypercube}{chapter.2}% 10
+\BOOKMARK [1][-]{section.2.2}{The Adaptive Tester over the Hypercube}{chapter.2}% 11
+\BOOKMARK [1][-]{section.2.3}{Extension to Hypergrids}{chapter.2}% 12
+\BOOKMARK [0][-]{chapter.3}{Lower Bounds}{}% 13
+\BOOKMARK [1][-]{section.3.1}{The Lower Bound for Nonadaptive Testers over Hypercubes}{chapter.3}% 14
+\BOOKMARK [2][-]{subsection.3.1.1}{Reduction to Comparison-Based Testers}{section.3.1}% 15
+\BOOKMARK [2][-]{subsection.3.1.2}{The Hard Distributions}{section.3.1}% 16
+\BOOKMARK [2][-]{subsection.3.1.3}{From Functions to Signed Graphs that are Hard to Distinguish}{section.3.1}% 17
+\BOOKMARK [2][-]{subsection.3.1.4}{Proving Theorem 3.1.11: Good and Bad Events}{section.3.1}% 18
+\BOOKMARK [2][-]{subsection.3.1.5}{Bounding the Probability of Bad Events: Proof of Theorem 3.1.16}{section.3.1}% 19
+\BOOKMARK [0][-]{chapter.4}{Conclusion}{}% 20
+\BOOKMARK [1][-]{section.4.1}{Conclusion and Open Directions}{chapter.4}% 21
+\BOOKMARK [0][-]{appendix.A}{Missing Details from the Main Body}{}% 22
+\BOOKMARK [1][-]{section.A.1}{The Lower Bound for Adaptive Testers over Hypergrids}{appendix.A}% 23
+\BOOKMARK [1][-]{section.A.2}{The Lower Bound for Nonadaptive Testers over Hypergrids}{appendix.A}% 24

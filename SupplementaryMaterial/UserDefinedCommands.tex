@@ -1,0 +1,138 @@
+% Place user-defined commands below.
+% Roksana Added these
+%Additional packages
+\usepackage{paralist}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+%\usepackage{graphicx}
+%\usepackage{bm}
+\usepackage{xspace}
+\usepackage{url}
+%\usepackage{boxedminipage}
+%\usepackage{wrapfig}
+%\usepackage{ifthen}
+\usepackage{color}
+\usepackage{xcolor}
+%\usepackage{framed}
+%\usepackage{algorithmic,algorithm}
+\usepackage{fullpage}
+\usepackage{cite}
+\usepackage{natbib}
+
+%\usepackage{thmtools}
+%\usepackage{thm-restate}
+\usepackage[colorlinks, citecolor = black,
+urlcolor=black,linkcolor=black,pdfstartview=FitH]{hyperref}
+\usepackage[ruled, noend, noline]{algorithm2e}
+\usepackage{verbatim}
+\usepackage{bbm}
+
+%Packages for appropriate appendix numbering
+\usepackage{chngcntr}
+\usepackage{apptools}
+
+%Additional definitions and theorems
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{fact}[theorem]{Fact}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{observation}[theorem]{Observation}
+%Numbering in appendix
+\AtAppendix{\counterwithin{theorem}{section}}
+%\AtAppendix{\counterwithin{claim}{section}}
+
+
+\newcommand{\eps}{\varepsilon}
+
+\def\hf{\hat{f}}
+\def\hg{\hat{g}}
+\def\Inf{{\sf Inf}}
+\def\Viol{{\sf Viol}}
+\def\I{{\mathbf I}}
+\def\V{{\mathbf V}}
+\def\R{{\mathbb R}}
+\def\bb{\mathbf{b}}
+\def\val{\mathtt{val}}
+\newcommand{\ord}[2][th]{\ensuremath{{#2}^{\mathrm{#1}}}}
+\newcommand{\coord}[2]{t^{#1}_{#2}}
+\newcommand{\capt}{\mathtt{cap}}
+\def\Yes{\mathbf{Yes}}
+\def\No{\mathbf {No}}
+\def\dec{\mathsf{val}}
+\def\sgn{\mathsf{sgn}}
+\def\supp{\mathsf{supp}}
+\def\dd{{d'}}
+\def\totcube{m}
+\def\dir{\mathsf{dir}}
+
+\newcommand{\dist}{\mathsf{dist}}
+
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\ceil}[1]{\lceil#1\rceil}
+\newcommand{\Exp}{\EX}
+\newcommand{\floor}[1]{\lfloor#1\rfloor}
+\newcommand{\cei}[1]{\lceil#1\rceil}
+\newcommand{\EX}{\hbox{\bf E}}
+\newcommand{\otilde}{\widetilde{O}}
+
+\newcommand{\cA}{{\cal A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{{\cal C}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cE}{{\cal E}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cG}{\mathcal{G}}
+\newcommand{\cH}{{\cal H}}
+\newcommand{\cI}{{\cal I}}
+\newcommand{\cJ}{{\cal J}}
+\newcommand{\cL}{{\cal L}}
+\newcommand{\cM}{{\cal M}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\cQ}{\mathcal{Q}}
+\newcommand{\cR}{{\cal R}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cT}{{\cal T}}
+\newcommand{\cU}{{\cal U}}
+\newcommand{\cV}{{\cal V}}
+\newcommand{\cX}{{\cal X}}
+
+\newcommand{\N}{\mathbb N}
+\newcommand{\calG}{{\cal G}}
+\newcommand{\calA}{{\cal A}}
+\newcommand{\calC}{{\cal C}}
+\newcommand{\calE}{{\cal E}}
+
+
+\newcommand{\bA}{\boldsymbol{A}}
+\newcommand{\bD}{\boldsymbol{D}}
+\newcommand{\bG}{\boldsymbol{G}}
+\newcommand{\bR}{\boldsymbol{R}}
+\newcommand{\bS}{\boldsymbol{S}}
+\newcommand{\bT}{\boldsymbol{T}}
+\newcommand{\bX}{\boldsymbol{X}}
+\newcommand{\bY}{\boldsymbol{Y}}
+\newcommand{\bZ}{\boldsymbol{Z}}
+
+\newcommand{\Sec}[1]{\hyperref[sec:#1]{Section~\ref*{sec:#1}}} %section
+\newcommand{\Eqn}[1]{\hyperref[eq:#1]{(\ref*{eq:#1})}} %equation
+\newcommand{\Fig}[1]{\hyperref[fig:#1]{Fig.\,\ref*{fig:#1}}} %figure
+\newcommand{\Tab}[1]{\hyperref[tab:#1]{Tab.\,\ref*{tab:#1}}} %table
+\newcommand{\Thm}[1]{\hyperref[thm:#1]{Theorem~\ref*{thm:#1}}} %theorem
+\newcommand{\Fact}[1]{\hyperref[fact:#1]{Fact\,\ref*{fact:#1}}} %fact
+\newcommand{\Lem}[1]{\hyperref[lem:#1]{Lemma~\ref*{lem:#1}}} %lemma
+\newcommand{\Prop}[1]{\hyperref[prop:#1]{Prop.~\ref*{prop:#1}}} %property
+\newcommand{\Cor}[1]{\hyperref[cor:#1]{Corollary~\ref*{cor:#1}}} %corollary
+\newcommand{\Conj}[1]{\hyperref[conj:#1]{Conjecture~\ref*{conj:#1}}} %conjecture
+\newcommand{\Def}[1]{\hyperref[def:#1]{Definition~\ref*{def:#1}}} %definition
+\newcommand{\Alg}[1]{\hyperref[alg:#1]{Algorithm~\ref*{alg:#1}}} %algorithm
+\newcommand{\Ex}[1]{\hyperref[ex:#1]{Ex.~\ref*{ex:#1}}} %example
+\newcommand{\Clm}[1]{\hyperref[clm:#1]{Claim~\ref*{clm:#1}}} %example
+\newcommand{\Step}[1]{\hyperref[step:#1]{Step~\ref*{step:#1}}} %example
+
+\newcommand{\new}[1]{{\color{red}{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End Roksana
